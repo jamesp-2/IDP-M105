@@ -1,0 +1,27 @@
+#Output pins
+from gpiozero import Motor
+
+left_motor = Motor(0,0)
+right_motor= Motor(0,0)
+
+#LEDS
+red_pin = 0
+yellow_pin = 0
+green_pin = 0
+
+servo_1_pin = 0
+servo_2_pin = 0
+
+#Input pins
+
+hall_pin = 0
+crash_pin = 0
+distance_pin = 0
+IR_pin = 0
+button_pin = 0
+
+#Track sensors
+track_1 = 0
+track_2 = 0
+track_3 = 0
+track_4 = 0

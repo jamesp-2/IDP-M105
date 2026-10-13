@@ -1,0 +1,23 @@
+state = "wait_for_start"
+
+if state = "wait for start":
+    #Wait for button press
+    state = "operate"
+
+if state = "operate":
+    find_box()
+    if box == "found":
+        state  = "pickup":
+    
+if state = "pickup":
+    #Pickup logic
+    close_claw()
+    lift()
+    state = "deliver"
+
+if state = "deliver":
+    find_location()
+    go_to_bay()
+    box = None
+    state = "operate"
+
