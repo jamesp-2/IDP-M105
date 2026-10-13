@@ -13,17 +13,20 @@ class rack():
         self.slt_list[slot_index] = 1
 
 class node():
-    def __init__(self, line_sensor_list):
-        self.line_sensor_list = line_sensor_list
+    def __init__(self, line_sensor_list1, line_sensor_list2):
+        self.line_sensor_list = [line_sensor_list1, line_sensor_list2]
+
 
     def decide_node_type(self, line_sensor_list):
-        if line_sensor_list == [1, 1, 1, 1]:
+        if line_sensor_list == [[1, 1, 1, 1], [0, 0, 0, 0]]:
             return "T junction"
-        elif line_sensor_list == [0, 1, 1, 1]:
+        elif line_sensor_list == [[1, 1, 1, 1], [0, 1, 1, 0]]:
+            return "Cross junction"
+        elif line_sensor_list == [[0, 1, 1, 1], [0, 0, 0, 0]]:
             return "Right turn"
-        elif line_sensor_list == [1, 1, 1, 0]:
+        elif line_sensor_list == [[1, 1, 1, 0], [0, 0, 0, 0]]:
             return "Left turn"
-
+        
 top_left_rack = rack("left", "top", [0, 0, 0, 0, 0, 0])
 bottom_left_rack = rack("left", "bottom", [0, 0, 0, 0, 0, 0])
 top_right_rack = rack("right", "top", [0, 0, 0, 0, 0, 0])
