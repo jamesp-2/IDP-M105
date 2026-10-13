@@ -38,7 +38,7 @@ def stop(self):
 
 #Green or red light from polarity 
 
-def polarity (self,pole):
+def polarity(self,pole):
     if pole =="N":
         self.red.value(On)
         self.yellow.value(Off)
