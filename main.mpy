@@ -1,3 +1,5 @@
+from config import *
+
 state = "wait_for_start"
 box = None
 
