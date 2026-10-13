@@ -1,16 +1,55 @@
 #Output pins
-from gpiozero import Motor
+from machine import Pin
+
+class Motor:
+    def __init__(self, dirPin, PWMPin):
+        self.mDir = Pin(dirPin, Pin.OUT)  # set motor direction pin
+        self.pwm = PWM(Pin(PWMPin))  # set motor pwm pin
+        self.pwm.freq(1000)  # set PWM frequency
+        self.pwm.duty_u16(0)  # set duty cycle - 0=off
+        
+    def off(self):
+        self.pwm.duty_u16(0)
+        
+    def Forward(self, speed=100):
+        self.mDir.value(0)                     
+        self.pwm.duty_u16(int(65535 * speed / 100))  # speed range 0-100 motor
+
+    def Reverse(self, speed=30):
+        self.mDir.value(1)
+        self.pwm.duty_u16(int(65535 * speed / 100))
+
 
 left_motor = Motor(0,0)
 right_motor= Motor(0,0)
 
 #LEDS
-red_pin = 0
-yellow_pin = 0
-green_pin = 0
+red_pin = Pin(0, Pin.OUT)
+yellow_pin = Pin(0, Pin.OUT)
+green_pin = Pin(0, Pin.OUT)
 
-servo_1_pin = 0
-servo_2_pin = 0
+class Servo:
+    MIN_DUTY = 1638 # 0°
+    MID_DUTY = 4915 # 135°
+    MAX_DUTY = 8192 # 270°
+
+    def __init__(self, ServoPin):
+        self.servo = PWM(ServoPin)
+        self.servo.freq(50)  # 50 Hz for servo
+ 
+    # Convert angle (0–270) to duty
+    def set_angle(self, angle):
+       # Clamp angle
+       if angle < 0:
+           angle = 0
+       if angle > 270:
+           angle = 270
+ 
+       duty = int(Servo.MIN_DUTY + (angle / 270) * (Servo.MAX_DUTY - Servo.MIN_DUTY))
+       self.servo.duty_u16(duty)
+
+servo_1 = Servo(Pin(0))
+servo_2 = Servo(Pin(0))
 
 #Input pins
 
@@ -18,7 +57,7 @@ hall_pin = 0
 crash_pin = 0
 distance_pin = 0
 IR_pin = 0
-button_pin = 0
+button = Pin(0, Pin.OUT)
 
 #Track sensors
 track_1 = 0

@@ -16,18 +16,10 @@ class rack():
         return f"Rack(side={self.side}, floor={self.floor}, slt_list={self.slt_list})"
 
     def first_available_slot(self):
-        """Return the first empty slot's index, or None if the rack is full."""
-        # Advance past occupied slots, starting from the cached position.
-        while (
-            self.next_free_slot < len(self.slt_list)
-            and self.slt_list[self.next_free_slot] != 0
-        ):
-            self.next_free_slot += 1
-
-        # If the cursor reached the end, there are no available slots.
-        if self.next_free_slot < len(self.slt_list):
-            return self.next_free_slot
-        return None
+        for i in range(len(self.slt_list)):
+            if self.slt_list[i] == 0:
+                return i
+        return -1
 
     def slot_is_full(self, slot_index):
         """Mark an empty slot as occupied and report if it was already full."""

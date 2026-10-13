@@ -1,23 +1,25 @@
 state = "wait_for_start"
+box = None
 
-if state = "wait for start":
-    #Wait for button press
-    state = "operate"
+while True:
+    if state == "wait_for_start":
+        if buttton.value = 1:
+            state = "operate"
 
-if state = "operate":
-    find_box()
-    if box == "found":
-        state  = "pickup":
-    
-if state = "pickup":
-    #Pickup logic
-    close_claw()
-    lift()
-    state = "deliver"
+    elif state == "operate":
+        box = find_box()
+        if box is not None:
+            state  = "pickup":
+        
+    elif state == "pickup":
+        close_claw()
+        lift()
+        state = "deliver"
 
-if state = "deliver":
-    find_location()
-    go_to_bay()
-    box = None
-    state = "operate"
+    elif state == "deliver":
+        go_to_bay(box)
+        lower()
+        open_claw()
+        box = None
+        state = "operate"
 
