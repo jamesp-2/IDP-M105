@@ -1,5 +1,5 @@
 from config import servo_1, servo_2
-from machine import Pin, PWM
+from machine import Pin, PWM #type: ignore
 
 class Servo:
     MIN_DUTY = 1638 # 0°
