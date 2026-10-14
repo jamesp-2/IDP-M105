@@ -1,5 +1,5 @@
 #Output pins
-from machine import Pin, PWM
+from machine import Pin, PWM #type: ignore
 
 left_motor_dir = 0
 left_motor_pwm = 0

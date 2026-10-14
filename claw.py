@@ -10,14 +10,14 @@ class servo:
 
     # Convert angle (0–270) to duty
     def set_angle(self, angle):
-       # Clamp angle
-       if angle < 0:
-           angle = 0
-       if angle > 270:
-           angle = 270
+        # Clamp angle
+        if angle < 0:
+            angle = 0
+        if angle > 270:
+            angle = 270
 
-       duty = int(Servo.MIN_DUTY + (angle / 270) * (Servo.MAX_DUTY - Servo.MIN_DUTY))
-       self.servo.duty_u16(duty)
+        duty = int(Servo.MIN_DUTY + (angle / 270) * (Servo.MAX_DUTY - Servo.MIN_DUTY))
+        self.servo.duty_u16(duty)
 
 servo_claw = Servo(Pin(servo_1))
 servo_lift = Servo(Pin(servo_2))

@@ -1,7 +1,7 @@
-from machine import Pin
+from machine import Pin #type: ignore
 import time
 from config import red_pin, yellow_pin, green_pin
- 
+
 On = 1
 Off = 0
 
@@ -56,7 +56,7 @@ def flash(self):
     if time.ticks_diff(now, self.last_toggle) >= flash_period:
         self.last_toggle = now
 
-        self.yellow.value(if self.value == On else Off)
+        self.yellow.value(if self.yellow.value() == On else Off)
 
         
         

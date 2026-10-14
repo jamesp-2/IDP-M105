@@ -1,5 +1,7 @@
 import map
-import time # tmporary for testing - Remove later before setting up a new time test for proper software
+import time # temporary for testing - Remove later before setting up a new time test for proper software
+from machine import Pin #type: ignore
+import motors
 
 
 def line_correction(line_sensor_readings):
@@ -10,14 +12,14 @@ def line_correction(line_sensor_readings):
 
     if inner_sensors == [0, 1]:
         # speed up left motor and slow down right motor to get back on the line
-        pass
+        motors.Bot.turn("left", speed=60)
     elif inner_sensors == [1, 0]:
         # slow down left motor and speed up right motor to get back on the line
-        pass
+        motors.Bot.turn("right", speed=60)
     elif inner_sensors == [0, 0]:
-        # Stop both motors, then spin left and right to check which side
+        # reverse motors to back up and search for the line, since the robot is off the line completely
         # the line is on before correcting position.
-        pass
+        motors.Bot.reverse(speed=30)
 
 
 def line_following(line_sensor_readings):
@@ -29,24 +31,45 @@ def line_following(line_sensor_readings):
 
     if outer_sensors != [0, 0]:
         # robot is at a junction
-        print("Junction detected")
         reading1 = line_sensor_readings
         # A second reading is intended to help classify the junction.
+        motors.Bot.stop()  # Stop the robot to take a second reading for junction classification
+        motors.Bot.forward(speed=30) # Move forward slightly to get a second reading
+        time.wait(0.5)  # Wait for a short duration to allow the robot to move forward
+        motors.Bot.stop()  # Stop the robot again to take the second reading
         reading2 = line_sensor_readings
         junction = map.node.decide_node_type(map.node, [reading1, reading2])
-        print(f"Junction type: {junction}")
+        if junction == "T junction":
+            # Handle T junction logic here
+            pass
+        elif junction == "Cross junction":
+            # Handle Cross junction logic here
+            pass
+        elif junction == "Right turn":
+            # Handle Right turn logic here
+            motors.Bot.turn("right", speed=60)
+            motors.Bot.forward()  # Move forward after turning
+        elif junction == "Left turn":
+            # Handle Left turn logic here
+            motors.Bot.turn("left", speed=60)
+            motors.Bot.forward()  # Move forward after turning  
+        elif junction == "Right T junction":
+            # Handle Right T junction logic here
+            pass
+        elif junction == "Left T junction":
+            # Handle Left T junction logic here
+            pass
 
     elif inner_sensors == [1, 1]:
         # robot is on line with no junctions
-        print("Moving forward")
+        motors.Bot.forward(speed=60)  # Move forward at full speed
     elif inner_sensors == [1, 0]:
         # robot has veered slightly to the right of the line
         on_line = False
         # Stop trying to correct after half a second, even if recovery fails.
-        start_time = time.time()
-        while not on_line and time.time() - start_time < 0.5:
+        #start_time = time.time()
+        while not on_line: #and time.time() - start_time < 0.5:
             line_correction(line_sensor_readings)
-            print("Slightly right")
             # Update line_sensor_readings here based on new sensor data
             on_line = inner_sensors == [1, 1]
 
@@ -54,10 +77,9 @@ def line_following(line_sensor_readings):
         # robot has veered slightly to the left of the line
         on_line = False
         # Bound the correction attempt so it cannot loop indefinitely.
-        start_time = time.time()
-        while not on_line and time.time() - start_time < 0.5:
+        #start_time = time.time()
+        while not on_line: #and time.time() - start_time < 0.5:
             line_correction(line_sensor_readings)
-            print("Slightly left")
             # Update line_sensor_readings here based on new sensor data
             on_line = inner_sensors == [1, 1]
 
@@ -65,9 +87,8 @@ def line_following(line_sensor_readings):
         # robot has veered off the line completely
         on_line = False
         # Bound the correction attempt so it cannot loop indefinitely.
-        start_time = time.time()
-        while not on_line and time.time() - start_time < 0.5:
+        #start_time = time.time()
+        while not on_line: #and time.time() - start_time < 0.5:
             line_correction(line_sensor_readings)
-            print("Off the line")
             # Update line_sensor_readings here based on new sensor data
             on_line = inner_sensors == [1, 1]

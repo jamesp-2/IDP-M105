@@ -53,6 +53,10 @@ class node():
             return "Right turn"
         elif line_sensor_list == [[1, 1, 1, 0], [0, 0, 0, 0]]:
             return "Left turn"
+        elif line_sensor_list == [[0, 1, 1, 1], [0, 1, 1, 0]]:
+            return "Right T junction"
+        elif line_sensor_list == [[1, 1, 1, 0], [0, 1, 1, 0]]:
+            return "Left T junction"
 
 
 # Create one initially empty rack for each corner of the map.

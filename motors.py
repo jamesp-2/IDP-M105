@@ -1,4 +1,4 @@
-from machine import Pin, PWM
+from machine import Pin, PWM # type: ignore
 from config import left_motor_dir, left_motor_pwm, right_motor_dir, right_motor_pwm
 
 class Motor:
