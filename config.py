@@ -1,33 +1,36 @@
 #Output pins
 from machine import Pin, PWM #type: ignore
 
-left_motor_dir = 0
-left_motor_pwm = 0
-right_motor_dir = 0
-right_motor_pwm = 0
+left_motor_dir = 4
+left_motor_pwm = 5
+right_motor_dir = 6
+right_motor_pwm = 7
 
 #LEDS
-red_pin = 0
-yellow_pin = 0
-green_pin = 0
+red_pin = 10
+yellow_pin = 9
+green_pin = 8
 
 #Servos
-servo_1 = 0
-servo_2 = 0
+servo_1 = 15
+servo_2 = 28
 
 #Input pins
 
 #Sensors
-hall_pin = 0
-crash_pin = 0
-distance_pin = 0
-IR_pin = 0
+hall_pin = 26 #Analogue
+crash_pin = 14
+IR_pin = 27 #Analogue
+
+#Distance pins
+sda_pin = 12
+scl_pin = 13
 
 
-button = Pin(0, Pin.IN, Pin.PULL_DOWN)
+button = Pin(15, Pin.IN, Pin.PULL_DOWN)
 
 #Track sensors
 track_1 = 0
-track_2 = 0
-track_3 = 0
-track_4 = 0
+track_2 = 1
+track_3 = 2
+track_4 = 3
