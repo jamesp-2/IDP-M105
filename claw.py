@@ -1,6 +1,7 @@
 from config import servo_1, servo_2
+from machine import Pin, PWM
 
-class servo:
+class Servo:
     MIN_DUTY = 1638 # 0°
     MID_DUTY = 4915 # 135°
     MAX_DUTY = 8192 # 270°

@@ -44,3 +44,7 @@ class Bot:
         elif direction == "right":
             self.left_motor.Forward(speed)
             self.right_motor.Reverse(speed)
+
+    def turn_around(self,speed=60):
+        self.left_motor.Reverse(speed)
+        self.right_motor.Forward(speed)

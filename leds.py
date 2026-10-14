@@ -56,7 +56,7 @@ def flash(self):
     if time.ticks_diff(now, self.last_toggle) >= flash_period:
         self.last_toggle = now
 
-        self.yellow.value(if self.value == On else Off)
+        self.yellow.value(Off if self.value == On else On)
 
         
         
