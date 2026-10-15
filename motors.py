@@ -1,5 +1,7 @@
 from machine import Pin, PWM # type: ignore
 from config import left_motor_dir, left_motor_pwm, right_motor_dir, right_motor_pwm
+import time
+
 
 class Motor:
     def __init__(self, dirPin, PWMPin):
@@ -48,3 +50,8 @@ class Bot:
     def turn_around(self,speed=60):
         self.left_motor.Reverse(speed)
         self.right_motor.Forward(speed)
+
+bot = Bot()
+bot.forward()
+time.sleep(5)
+bot.stop()

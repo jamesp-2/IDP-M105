@@ -3,8 +3,8 @@ from machine import Pin, PWM #type: ignore
 
 left_motor_dir = 4
 left_motor_pwm = 5
-right_motor_dir = 6
-right_motor_pwm = 7
+right_motor_dir = 7
+right_motor_pwm = 6
 
 #LEDS
 red_pin = 10
