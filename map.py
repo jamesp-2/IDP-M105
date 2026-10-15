@@ -64,3 +64,23 @@ top_left_rack = rack("left", "top", [0, 0, 0, 0, 0, 0])
 bottom_left_rack = rack("left", "bottom", [0, 0, 0, 0, 0, 0])
 top_right_rack = rack("right", "top", [0, 0, 0, 0, 0, 0])
 bottom_right_rack = rack("right", "bottom", [0, 0, 0, 0, 0, 0])
+
+#Set Directions
+
+#Map formatting: Node: Direction: (Next Node, Distance, Rack)
+Map = {
+    "Start": {
+        "W": ("JL", 4, None),
+        "E": ("JR", 4, None),
+        "N": ("JM", 4, None)},
+    "JL": {
+        "W": ("CL", 4, None),
+        "E": ("Start", 4, None)},
+    "JR": {
+        "E": ("CR", 4, None),
+        "W": ("Start", 4, None)},
+    "JM": {
+        "N": ("M1", 4, None),
+        "S": ("Start", 4, None)},
+
+}

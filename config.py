@@ -27,7 +27,7 @@ sda_pin = 12
 scl_pin = 13
 
 
-button = Pin(15, Pin.IN, Pin.PULL_DOWN)
+button = Pin(16, Pin.IN, Pin.PULL_DOWN)
 
 #Track sensors
 track_1 = 0
