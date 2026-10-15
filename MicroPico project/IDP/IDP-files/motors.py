@@ -1,5 +1,10 @@
 """Low-level motor drivers and the two-motor robot controller."""
 
+import sys
+
+if "IDP-files" not in sys.path:
+    sys.path.append("IDP-files")
+
 from machine import Pin, PWM # type: ignore
 from config import left_motor_dir, left_motor_pwm, right_motor_dir, right_motor_pwm
 
@@ -12,25 +17,35 @@ class Motor:
         self.mDir = Pin(dirPin, Pin.OUT)  # set motor direction pin
         self.pwm = PWM(Pin(PWMPin))  # set motor pwm pin
         self.pwm.freq(1000)  # set PWM frequency
-        self.pwm.duty_u16(0)  # A zero duty cycle leaves the motor stopped.
         self.off()
         
     def off(self):
-        """Stop the motor by setting its PWM duty cycle to zero."""
+        """Stop the motor by setting both pins low to remove potential difference."""
+        self.mDir.value(0) # Ensure the direction pin is low[cite: 6]
         self.pwm.duty_u16(0) 
         
-    def Forward(self, speed=100):
+    def Forward(self, speed):
         """Run the motor forward at a percentage speed from 0 through 100."""
+        if speed == 0:
+            self.off()
+            return
+
         # This controller uses direction level 0 for forward operation.
         self.mDir.value(0)                     
         # Convert the requested percentage to the 16-bit PWM duty range.
         self.pwm.duty_u16(int(65535 * speed / 100))
 
-    def Reverse(self, speed=30):
+    def Reverse(self, speed):
         """Run the motor in reverse at a percentage speed from 0 through 100."""
+        if speed == 0:
+            self.off()
+            return
+
         # This controller uses direction level 1 for reverse operation.
         self.mDir.value(1)
-        self.pwm.duty_u16(int(65535 * speed / 100))
+        # Invert the PWM duty cycle because the direction pin is driven high.
+        inverted_duty = 65535 - int(65535 * speed / 100)
+        self.pwm.duty_u16(inverted_duty)
 
 
 class Bot:
@@ -46,6 +61,7 @@ class Bot:
         self.left_motor.off()
         self.right_motor.off()
 
+    # Added default speed arguments so test.py and path.py can run without errors
     def forward(self, speed=100):
         """Drive both wheels forward at the same speed."""
         self.left_motor.Forward(speed)
@@ -56,7 +72,7 @@ class Bot:
         self.left_motor.Reverse(speed)
         self.right_motor.Reverse(speed)
 
-    def turn(self, direction, speed=60):
+    def turn(self, direction, speed=50):
         """Turn in place by driving the wheels in opposite directions."""
         if direction == "left":
             self.left_motor.Reverse(speed)
@@ -67,7 +83,7 @@ class Bot:
         else:
             raise ValueError("Direction must be 'left' or 'right'.")
 
-    def turn_around(self,speed=60):
+    def turn_around(self, speed=50):
         """Rotate approximately 180 degrees using opposite wheel motion."""
         self.left_motor.Reverse(speed)
         self.right_motor.Forward(speed)

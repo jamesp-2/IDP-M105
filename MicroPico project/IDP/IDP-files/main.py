@@ -1,6 +1,10 @@
 """Top-level robot workflow with hardware-specific steps left explicit."""
 
+import sys
 import time
+
+if "IDP-files" not in sys.path:
+    sys.path.append("IDP-files")
 
 from claw import close_claw, lift, lower, open_claw
 from config import button

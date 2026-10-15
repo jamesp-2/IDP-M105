@@ -10,6 +10,7 @@
         "~/.micropico-stubs/included"
     ],
     "python.analysis.extraPaths": [
+        "${workspaceFolder}/IDP-files",
         "~/.micropico-stubs/included"
     ]
 }

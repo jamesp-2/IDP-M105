@@ -1,5 +1,10 @@
 """Control the status LEDs and provide a non-blocking yellow flash."""
 
+import sys
+
+if "IDP-files" not in sys.path:
+    sys.path.append("IDP-files")
+
 from machine import Pin #type: ignore
 import time
 from config import red_pin, yellow_pin, green_pin

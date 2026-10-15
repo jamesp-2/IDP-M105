@@ -1,5 +1,11 @@
 """Standalone test loop for the four line-tracking sensors."""
 
+import time
+import sys
+
+if "IDP-files" not in sys.path:
+    sys.path.append("IDP-files")
+
 from machine import Pin
 from config import track_1, track_2, track_3, track_4
 from path import line_following
@@ -18,7 +24,9 @@ def read_line_sensors():
     return [sensor.value() for sensor in track_sensors]
 
 
-# Continuously sample the sensors and pass fresh readings to the line controller.
+# Monitor the sensor inputs and apply one line-following step per sample.
 while True:
-    line_following(read_line_sensors(), read_line_sensors)
-
+    readings = read_line_sensors()
+    print(readings)
+    line_following(readings, read_line_sensors)
+    time.sleep_ms(50)

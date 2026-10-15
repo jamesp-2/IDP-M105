@@ -1,5 +1,6 @@
 """Storage-rack occupancy and line-pattern junction classification."""
-
+import motors
+import time
 
 class rack():
     """Track the free and occupied slots for one rack location."""
@@ -39,35 +40,40 @@ class rack():
 
 
 class node():
-    """Store two line-sensor samples and classify their junction pattern."""
+    """Classify a junction using its initial and fresh sensor samples."""
 
-    def __init__(self, line_sensor_list1, line_sensor_list2):
+    def __init__(self, line_sensor_list):
         """Keep the earlier and later readings in classification order."""
-        self.line_sensor_list = [line_sensor_list1, line_sensor_list2]
+        self.line_sensor_list = line_sensor_list
 
     def __repr__(self):
         """Return a readable description of this node's sensor readings."""
         return f"Node(line_sensor_list={self.line_sensor_list})"
 
-    def decide_node_type(self, line_sensor_list=None):
-        """Return a junction label for a known pair of four-sensor patterns."""
-        if line_sensor_list is None:
-            line_sensor_list = self.line_sensor_list
+    def decide_node_type(self, read_sensors):
+        """Advance to the junction and classify it from a fresh sensor sample."""
+        first_reading = self.line_sensor_list
 
-        # Match the two observations against the supported junction patterns.
-        if line_sensor_list == [[1, 1, 1, 1], [0, 0, 0, 0]]:
-            return "T junction"
-        elif line_sensor_list == [[1, 1, 1, 1], [0, 1, 1, 0]]:
+        if first_reading not in ([1, 1, 1, 1], [1, 1, 1, 0], [0, 1, 1, 1]):
+            return None
+
+        motors.bot.stop()
+        start = time.time()
+        while time.time() - start < 0.2:
+            motors.bot.forward(30)
+        second_reading = read_sensors()
+
+        if first_reading == [1, 1, 1, 1]:
+            if second_reading == [0, 0, 0, 0]:
+                return "T junction"
             return "Cross junction"
-        elif line_sensor_list == [[0, 1, 1, 1], [0, 0, 0, 0]]:
-            return "Right turn"
-        elif line_sensor_list == [[1, 1, 1, 0], [0, 0, 0, 0]]:
-            return "Left turn"
-        elif line_sensor_list == [[0, 1, 1, 1], [0, 1, 1, 0]]:
-            return "Right T junction"
-        elif line_sensor_list == [[1, 1, 1, 0], [0, 1, 1, 0]]:
+        if first_reading == [1, 1, 1, 0]:
+            if second_reading == [0, 0, 0, 0]:
+                return "Left turn"
             return "Left T junction"
-        return None
+        if second_reading == [0, 0, 0, 0]:
+            return "Right turn"
+        return "Right T junction"
 
 
 # Initialize six empty slots for each of the four rack locations.

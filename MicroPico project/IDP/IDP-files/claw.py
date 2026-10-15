@@ -1,5 +1,10 @@
 """Servo setup and explicit placeholders for claw/lift movements."""
 
+import sys
+
+if "IDP-files" not in sys.path:
+    sys.path.append("IDP-files")
+
 from config import servo_1, servo_2
 from machine import Pin, PWM #type: ignore
 

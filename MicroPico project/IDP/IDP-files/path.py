@@ -1,8 +1,13 @@
 """Line-sensor validation, line following, and basic junction response."""
 
+import sys
+
+if "IDP-files" not in sys.path:
+    sys.path.append("IDP-files")
+
 import map
-import time
 import motors
+import time
 
 
 def line_correction(line_sensor_readings):
@@ -13,14 +18,14 @@ def line_correction(line_sensor_readings):
 
     # Pivot toward the side whose inner sensor still detects the line.
     if inner_sensors == [0, 1]:
-        motors.bot.turn("right", speed=60)
+        motors.bot.turn("right", speed=40)
     elif inner_sensors == [1, 0]:
-        motors.bot.turn("left", speed=60)
+        motors.bot.turn("left", speed=40)
     elif inner_sensors == [0, 0]:
         # Neither inner sensor sees the line, so reverse to search for it.
-        motors.bot.reverse(speed=30)
+        motors.bot.reverse(speed=50)
 
-def line_following(line_sensor_readings, read_sensors=None):
+def line_following(line_sensor_readings, read_sensors):
     """Follow a line and classify junctions using a fresh-reading callback."""
 
     # The middle sensors track the path; the outer pair flags a junction.
@@ -29,36 +34,34 @@ def line_following(line_sensor_readings, read_sensors=None):
 
     if outer_sensors != [0, 0]:
         # A second sample is required to distinguish junction patterns.
-        if read_sensors is None:
-            motors.bot.stop()
-            raise RuntimeError("Junction handling requires a fresh sensor-reading callback.")
 
-        # Advance carefully, then stop to capture the second junction pattern.
-        motors.bot.stop()
-        motors.bot.forward(speed=30)
-        time.sleep(0.5)
-        motors.bot.stop()
-        reading2 = read_sensors()
-
-        # Classify the original and fresh readings as one junction observation.
-        junction = map.node(line_sensor_readings, reading2).decide_node_type()
-        if junction == "T junction":
+        # Let the classifier take a fresh sample after moving onto the junction.
+        junction = map.node(line_sensor_readings).decide_node_type(read_sensors)
+        print(junction)
+        if junction is not None:
             # Navigation choices at junctions are not defined yet; keep the robot stopped.
             motors.bot.stop()
-        elif junction == "Cross junction":
-            motors.bot.stop()
-        elif junction == "Right turn":
-            motors.bot.turn("right", speed=60)
-            motors.bot.forward()
-        elif junction == "Left turn":
-            motors.bot.turn("left", speed=60)
-            motors.bot.forward()
-        else:
-            # Stop for unknown patterns and junction types without a route policy.
-            motors.bot.stop()
-        return junction
+            time.sleep(1)
+            if junction == "Right turn":
+                start = time.time()
+                while time.time() - start < 1:
+                    motors.bot.turn("right")
+            elif junction == "Left turn":
+                start = time.time()
+                while time.time() - start < 1:
+                    motors.bot.turn("left")
+            elif junction == "T junction":
+                motors.bot.turn("right")
+            elif junction == "Cross junction":
+                pass
+            if junction == "Right T junction":
+                pass
+            elif junction == "Left T junction":
+                pass
 
-    elif inner_sensors == [1, 1]:
+            return junction
+
+    if inner_sensors == [1, 1]:
         # Both inner sensors see the line, so continue straight.
         motors.bot.forward(speed=60)
     else:
