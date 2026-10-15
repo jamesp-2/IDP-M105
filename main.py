@@ -5,7 +5,7 @@ box = None
 
 while True:
     if state == "wait_for_start":
-        if buttton.value() = 1:
+        if button.value() = 1:
             state = "operate"
 
     elif state == "operate":
