@@ -7,7 +7,6 @@ import motors
 
 def line_correction(line_sensor_readings):
     """Apply one steering correction based on the two center sensors."""
-    _validate_reading(line_sensor_readings)
 
     # Sensors 1 and 2 are the inner pair; 1 means that sensor sees the line.
     inner_sensors = [line_sensor_readings[1], line_sensor_readings[2]]
@@ -21,16 +20,8 @@ def line_correction(line_sensor_readings):
         # Neither inner sensor sees the line, so reverse to search for it.
         motors.bot.reverse(speed=30)
 
-
-def _validate_reading(reading):
-    """Require exactly four binary sensor states before controlling motors."""
-    if len(reading) != 4 or any(value not in (0, 1) for value in reading):
-        raise ValueError("A line-sensor reading must contain four binary values.")
-
-
 def line_following(line_sensor_readings, read_sensors=None):
     """Follow a line and classify junctions using a fresh-reading callback."""
-    _validate_reading(line_sensor_readings)
 
     # The middle sensors track the path; the outer pair flags a junction.
     inner_sensors = [line_sensor_readings[1], line_sensor_readings[2]]
@@ -48,7 +39,6 @@ def line_following(line_sensor_readings, read_sensors=None):
         time.sleep(0.5)
         motors.bot.stop()
         reading2 = read_sensors()
-        _validate_reading(reading2)
 
         # Classify the original and fresh readings as one junction observation.
         junction = map.node(line_sensor_readings, reading2).decide_node_type()

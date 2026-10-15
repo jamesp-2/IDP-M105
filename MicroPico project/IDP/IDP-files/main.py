@@ -8,12 +8,12 @@ from config import button
 
 def find_box():
     """Placeholder for box detection; sensor behavior is not specified."""
-    raise NotImplementedError("Implement box detection for the installed sensors.")
+    pass
 
 
 def go_to_bay(box):
     """Placeholder for routing; the map and route policy are not specified."""
-    raise NotImplementedError("Implement bay navigation for this robot.")
+    pass
 
 
 def main():

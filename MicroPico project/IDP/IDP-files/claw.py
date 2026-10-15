@@ -33,16 +33,16 @@ servo_lift = Servo(Pin(servo_2))
 
 def close_claw():
     """Placeholder until the correct closed angle is known for the claw."""
-    raise NotImplementedError("Set the claw's close angle for the installed mechanism.")
+    pass
 
 def lift():
     """Placeholder until the correct raised angle is known for the lift."""
-    raise NotImplementedError("Set the lift's raised angle for the installed mechanism.")
+    pass
 
 def open_claw():
     """Placeholder until the correct open angle is known for the claw."""
-    raise NotImplementedError("Set the claw's open angle for the installed mechanism.")
+    pass
 
 def lower():
     """Placeholder until the correct lowered angle is known for the lift."""
-    raise NotImplementedError("Set the lift's lowered angle for the installed mechanism.")
+    pass

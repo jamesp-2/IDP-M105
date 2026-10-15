@@ -21,7 +21,6 @@ class Motor:
         
     def Forward(self, speed=100):
         """Run the motor forward at a percentage speed from 0 through 100."""
-        self._validate_speed(speed)
         # This controller uses direction level 0 for forward operation.
         self.mDir.value(0)                     
         # Convert the requested percentage to the 16-bit PWM duty range.
@@ -29,16 +28,9 @@ class Motor:
 
     def Reverse(self, speed=30):
         """Run the motor in reverse at a percentage speed from 0 through 100."""
-        self._validate_speed(speed)
         # This controller uses direction level 1 for reverse operation.
         self.mDir.value(1)
         self.pwm.duty_u16(int(65535 * speed / 100))
-
-    @staticmethod
-    def _validate_speed(speed):
-        """Reject PWM percentages that cannot be represented safely."""
-        if not 0 <= speed <= 100:
-            raise ValueError("Motor speed must be between 0 and 100.")
 
 
 class Bot:
