@@ -13,11 +13,8 @@ from mapping import *
 
 
 
-def pick_bay():
-    chosen_location = pick_up_locations[current_selection]
-    if current_selection == 3:
-        current_selection = 0
-    return chosen_location
+def pick_bay(selection):
+    return pick_up_locations[selection % len(pick_up_locations)]
 
     
 
@@ -30,6 +27,7 @@ def go_to_bay(box):
 def main():
     """Wait for start, then repeat the pickup-and-delivery state sequence."""
     state = "wait_for_start"
+    selection = 0
     box = None
     current_location = []
     current_direction = N
@@ -42,8 +40,9 @@ def main():
 
         elif state == "operate":
             # Look for work only after start; the detector is hardware-specific.
-            bay = pick_bay()
+            bay = pick_bay(selection)
             follow_path(bay, current_direction, current_location)
+            selection+=1
             state = "pickup"
 
         elif state == "pickup":

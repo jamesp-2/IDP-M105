@@ -61,10 +61,10 @@ class node():
         if first_reading not in ([1, 1, 1, 1], [1, 1, 1, 0], [0, 1, 1, 1]):
             return None
 
-        motors.bot.stop()
+        bot.stop()
         start = time.time()
         while time.time() - start < 0.2:
-            motors.bot.forward(30)
+            bot.forward(30)
         second_reading = read_sensors()
 
         if first_reading == [1, 1, 1, 1]:

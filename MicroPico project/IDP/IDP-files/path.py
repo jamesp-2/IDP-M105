@@ -40,7 +40,7 @@ def line_following(line_sensor_readings, read_sensors):
         # A second sample is required to distinguish junction patterns.
 
         # Let the classifier take a fresh sample after moving onto the junction.
-        junction = map.node(line_sensor_readings).decide_node_type(read_sensors)
+        junction = node(line_sensor_readings).decide_node_type(read_sensors)
         print(junction)
         if junction is not None:
             # Navigation choices at junctions are not defined yet; keep the robot stopped.
@@ -74,7 +74,7 @@ def line_following(line_sensor_readings, read_sensors):
         reading2 = read_sensors()
 
         # Classify the original and fresh readings as one junction observation.
-        junction = map.node(line_sensor_readings, reading2).decide_node_type()
+        junction = node(line_sensor_readings, reading2).decide_node_type()
         if junction == "T junction":
             # Navigation choices at junctions are not defined yet; keep the robot stopped.
             bot.stop()
@@ -91,7 +91,6 @@ def line_following(line_sensor_readings, read_sensors):
             bot.stop()
         return junction
 
-            return junction
 
     if inner_sensors == [1, 1]:
         # Both inner sensors see the line, so continue straight.
@@ -118,6 +117,7 @@ def turn_to_direction(current_direction, next_direction, reverse):
         bot.turn("right", speed=60)
 
     current_direction = next_direction
+    return next_direction
 
 
 
@@ -139,7 +139,7 @@ def follow_path(chosen_location, current_direction, current_path):
     #Bot is at start
     if len(current_path) == 0:
         #Turn to direction of first step
-        turn_to_direction(current_direction, intended_path[0], False)
+        current_direction = turn_to_direction(current_direction, intended_path[0], False)
         #Move until junction is reached
         #Add to current location
         current_path.append(intended_path[0])
@@ -147,13 +147,13 @@ def follow_path(chosen_location, current_direction, current_path):
     for i in range(len(current_path)):
         if current_path[i] != intended_path[i]:
             #Turn to opposite direction of current step
-            turn_to_direction(current_direction, intended_path[i], True)
+            current_direction = turn_to_direction(current_direction, intended_path[i], True)
             #Move until junction is reached
             #Remove last location
             pass
         else: 
             #Turn to direction of next step
-            turn_to_direction(current_direction, intended_path[i], False)
+            current_direction = turn_to_direction(current_direction, intended_path[i], False)
             #Move until junction is reached
             #Add to current location
             current_path.append(intended_path[i])
