@@ -8,11 +8,18 @@ if "IDP-files" not in sys.path:
 
 from claw import close_claw, lift, lower, open_claw
 from config import button
+from path import *
+from mapping import *
 
 
-def find_box():
-    """Placeholder for box detection; sensor behavior is not specified."""
-    pass
+
+def pick_bay():
+    chosen_location = pick_up_locations[current_selection]
+    if current_selection == 3:
+        current_selection = 0
+    return chosen_location
+
+    
 
 
 def go_to_bay(box):
@@ -24,6 +31,8 @@ def main():
     """Wait for start, then repeat the pickup-and-delivery state sequence."""
     state = "wait_for_start"
     box = None
+    current_location = []
+    current_direction = N
 
     while True:
         # Remain idle until the configured start button is pressed.
@@ -33,9 +42,9 @@ def main():
 
         elif state == "operate":
             # Look for work only after start; the detector is hardware-specific.
-            box = find_box()
-            if box is not None:
-                state = "pickup"
+            bay = pick_bay()
+            follow_path(bay, current_direction, current_location)
+            state = "pickup"
 
         elif state == "pickup":
             # Secure the detected item and raise it before attempting delivery.
