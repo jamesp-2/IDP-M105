@@ -37,7 +37,7 @@ servo_claw = Servo(Pin(servo_1))
 servo_lift = Servo(Pin(servo_2))
 
 def close_claw():
-    """Placeholder until the correct closed angle is known for the claw."""
+    servo_claw.set_angle(0)
     pass
 
 def lift():
@@ -45,7 +45,7 @@ def lift():
     pass
 
 def open_claw():
-    """Placeholder until the correct open angle is known for the claw."""
+    servo_claw.set_angle(270)
     pass
 
 def lower():
