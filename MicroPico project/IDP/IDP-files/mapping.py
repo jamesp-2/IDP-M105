@@ -1,6 +1,10 @@
 """Storage-rack occupancy and line-pattern junction classification."""
-import motors
-import time
+from motors import *
+
+N=0
+E=1
+S=2
+W=3
 
 class rack():
     """Track the free and occupied slots for one rack location."""
@@ -57,7 +61,7 @@ class node():
         if first_reading not in ([1, 1, 1, 1], [1, 1, 1, 0], [0, 1, 1, 1]):
             return None
 
-        motors.bot.stop()
+        bot.stop()
         start = time.time()
         while time.time() - start < 0.4:
             motors.bot.forward(30)
@@ -81,3 +85,22 @@ top_left_rack = rack("left", "top", [0, 0, 0, 0, 0, 0])
 bottom_left_rack = rack("left", "bottom", [0, 0, 0, 0, 0, 0])
 top_right_rack = rack("right", "top", [0, 0, 0, 0, 0, 0])
 bottom_right_rack = rack("right", "bottom", [0, 0, 0, 0, 0, 0])
+
+
+#Directions
+path_from_start ={
+    "P1": [E,E,N],
+    "P2": [E,E,N,N],
+    "P3": [W,W,N],
+    "P4": [W,W,N,N],
+    "BL1":[E,E,N,N],
+    "TR": [N,N],
+    "BR1":[E,E,N,N]
+    }
+
+pick_up_locations = ["P1","P2","P3","P4"]
+current_selection = 0
+
+
+
+
