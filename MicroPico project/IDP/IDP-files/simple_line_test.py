@@ -23,7 +23,6 @@ def read_line_sensors():
     """Return the current digital states in left-to-right sensor order."""
     return [sensor.value() for sensor in track_sensors]
 
-
 # Monitor the sensor inputs and apply one line-following step per sample.
 while True:
     readings = read_line_sensors()

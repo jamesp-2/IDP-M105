@@ -43,18 +43,23 @@ def line_following(line_sensor_readings, read_sensors):
             motors.bot.stop()
             time.sleep(1)
             if junction == "Right turn":
-                start = time.time()
-                while time.time() - start < 1:
-                    motors.bot.turn("right")
-            elif junction == "Left turn":
-                start = time.time()
-                while time.time() - start < 1:
-                    motors.bot.turn("left")
-            elif junction == "T junction":
+                motors.bot.forward()
+                time.sleep(0.3)
                 motors.bot.turn("right")
+                time.sleep(1.8)
+            elif junction == "Left turn":
+                motors.bot.forward()
+                time.sleep(0.3)
+                motors.bot.turn("left")
+                time.sleep(1.5)
+            elif junction == "T junction":
+                motors.bot.reverse()
+                time.sleep(0.5)
+                motors.bot.turn("right")
+                time.sleep(7)
             elif junction == "Cross junction":
                 pass
-            if junction == "Right T junction":
+            elif junction == "Right T junction":
                 pass
             elif junction == "Left T junction":
                 pass

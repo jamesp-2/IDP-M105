@@ -59,7 +59,7 @@ class node():
 
         motors.bot.stop()
         start = time.time()
-        while time.time() - start < 0.2:
+        while time.time() - start < 0.4:
             motors.bot.forward(30)
         second_reading = read_sensors()
 

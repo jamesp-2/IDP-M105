@@ -65,7 +65,7 @@ class Bot:
     def forward(self, speed=100):
         """Drive both wheels forward at the same speed."""
         self.left_motor.Forward(speed)
-        self.right_motor.Forward(speed)
+        self.right_motor.Forward(speed-3)
 
     def reverse(self, speed=30):
         """Drive both wheels backward at the same speed."""
