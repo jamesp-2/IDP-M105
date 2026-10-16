@@ -1,5 +1,6 @@
 """Storage-rack occupancy and line-pattern junction classification."""
 from motors import *
+import time
 
 N=0
 E=1
@@ -26,7 +27,7 @@ class rack():
         for i in range(len(self.slt_list)):
             if self.slt_list[i] == 0:
                 return i
-        return -1
+        return "Full"
 
     def slot_is_full(self, slot_index):
         """Mark a slot occupied, returning whether it was previously empty."""
@@ -57,27 +58,33 @@ class node():
     def decide_node_type(self, read_sensors):
         """Advance to the junction and classify it from a fresh sensor sample."""
         first_reading = self.line_sensor_list
+        outer_first_reading = [first_reading[0], first_reading[-1]]
 
-        if first_reading not in ([1, 1, 1, 1], [1, 1, 1, 0], [0, 1, 1, 1]):
+        if outer_first_reading not in ([1, 1], [1, 0], [0, 1]):
             return None
 
         bot.stop()
         start = time.time()
         while time.time() - start < 0.4:
-            motors.bot.forward(30)
+            bot.forward(30)
         second_reading = read_sensors()
+        inner_second_reading = [second_reading[1], second_reading[2]]
 
-        if first_reading == [1, 1, 1, 1]:
-            if second_reading == [0, 0, 0, 0]:
+        if outer_first_reading == [1, 1]:
+            if inner_second_reading == [0, 0]:
                 return "T junction"
-            return "Cross junction"
-        if first_reading == [1, 1, 1, 0]:
-            if second_reading == [0, 0, 0, 0]:
+            elif inner_second_reading == [1, 1]:
+                return "Cross junction"
+        elif outer_first_reading == [1, 0]:
+            if inner_second_reading == [0, 0]:
                 return "Left turn"
-            return "Left T junction"
-        if second_reading == [0, 0, 0, 0]:
-            return "Right turn"
-        return "Right T junction"
+            elif inner_second_reading == [1, 1]:
+                return "Left T junction"
+        elif outer_first_reading == [0, 1]:
+            if inner_second_reading == [0, 0]:
+                return "Right turn"
+            elif inner_second_reading == [1, 1]:
+                return "Right T junction"
 
 
 # Initialize six empty slots for each of the four rack locations.
