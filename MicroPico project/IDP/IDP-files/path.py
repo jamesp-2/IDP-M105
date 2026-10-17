@@ -10,7 +10,7 @@ import time
 from motors import *
 
 
-def line_correction(line_sensor_readings):
+def line_correction(line_sensor_readings, direction = "F"):
     """Apply one steering correction based on the two center sensors."""
 
     # Sensors 1 and 2 are the inner pair; 1 means that sensor sees the line.
@@ -18,12 +18,15 @@ def line_correction(line_sensor_readings):
 
     # Pivot toward the side whose inner sensor still detects the line.
     if inner_sensors == [0, 1]:
-        bot.turn("right", speed=60)
+        bot.turn("right", 60)
     elif inner_sensors == [1, 0]:
-        bot.turn("left", speed=60)
+        bot.turn("left", 60)
     elif inner_sensors == [0, 0]:
         # Neither inner sensor sees the line, so reverse to search for it.
-        bot.reverse(speed=30)
+        if direction == "R":
+            bot.forward(30)
+        else:
+            bot.reverse(30)
 
 
 def line_following(line_sensor_readings, read_sensors):

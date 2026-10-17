@@ -7,6 +7,7 @@ if "IDP-files" not in sys.path:
 
 from machine import Pin, PWM # type: ignore
 from config import left_motor_dir, left_motor_pwm, right_motor_dir, right_motor_pwm
+import time
 
 
 class Motor:
@@ -65,7 +66,7 @@ class Bot:
     def forward(self, speed=100):
         """Drive both wheels forward at the same speed."""
         self.left_motor.Forward(speed)
-        self.right_motor.Forward(speed-3)
+        self.right_motor.Forward(speed)
 
     def reverse(self, speed=30):
         """Drive both wheels backward at the same speed."""

@@ -27,7 +27,7 @@ class rack():
         for i in range(len(self.slt_list)):
             if self.slt_list[i] == 0:
                 return i
-        return "Full"
+        return -1
 
     def slot_is_full(self, slot_index):
         """Mark a slot occupied, returning whether it was previously empty."""
