@@ -29,7 +29,9 @@ def test_path(line_sensor_readings):
     for _ in range(mapping.bottom_right_rack.first_available_slot()):
         monday_test_route.append("straight")
     monday_test_route.extend([
-        "left", 
+        "left",
+        "straight",
+        "straight", 
         "right", 
         "right", 
         "right", 
