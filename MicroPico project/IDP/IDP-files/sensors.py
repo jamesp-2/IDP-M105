@@ -11,6 +11,11 @@ track_sensors = [
     Pin(track_4, Pin.IN),
 ]
 
+
+def read_line_sensors():
+    readings = [sensor.value() for sensor in track_sensors]
+
+
 def get_distance():
     """Read a distance once the installed driver's API has been identified."""
     pass

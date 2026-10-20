@@ -59,7 +59,7 @@ path_from_start ={
     "P4": [W,W,N,N],
     "BL1":[E,E,N,N],
     "TR": [N,N],
-    "BR1":[E,E,N,N]
+    "BR1":[W,W,N,N]
     }
 
 pick_up_locations = ["P1","P2","P3","P4"]
