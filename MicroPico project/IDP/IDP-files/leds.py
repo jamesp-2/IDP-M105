@@ -8,6 +8,7 @@ if "IDP-files" not in sys.path:
 from machine import Pin #type: ignore
 import time
 from config import red_pin, yellow_pin, green_pin
+from sensors import get_magentic_reading
 
 # Digital output levels used for turning an LED on or off.
 On = 1
@@ -48,7 +49,8 @@ class LED:
         self.green.value(Off)
         self.yellow_on = False
 
-    def polarity(self, pole):
+    def set_polarity(self, pole):
+        pole = get_magentic_reading
         """Show north polarity in red or south polarity in green."""
         if pole == "N":
             self.red.value(On)
@@ -72,3 +74,4 @@ class LED:
             self.last_toggle = now
             self.yellow_on = not self.yellow_on
             self.yellow.value(On if self.yellow_on else Off)
+

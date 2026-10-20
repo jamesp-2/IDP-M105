@@ -1,7 +1,8 @@
 """Distance-sensor integration placeholder."""
 
-from machine import Pin
-from config import track_1, track_2, track_3, track_4
+from machine import Pin, ADC
+from config import track_1, track_2, track_3, track_4, hall_pin
+import time
 
 # Create each sensor input once rather than reconfiguring the pins per sample.
 track_sensors = [
@@ -20,3 +21,20 @@ def get_distance():
     """Read a distance once the installed driver's API has been identified."""
     pass
 
+
+def get_magentic_reading():
+    hall_adc = ADC(hall_pin)
+    val = 0
+    for i in range(10):
+        val += hall_adc.read_u16()
+
+    val = val/10
+
+    if val > 9000:
+        print("North")
+        return "N"
+
+    elif val < -9000:
+        print("South")
+        return"S"
+    return None
