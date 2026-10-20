@@ -264,7 +264,7 @@ def perform_task_move(direction, task_type):
             break
 
         inner_sensors = [line_sensor_readings[1], line_sensor_readings[2]]
-        if inner_sensors == [1, 1] or inner_sensors == [0, 0]:
+        if inner_sensors == [1, 1] or inner_sensors == [0, 0]: "CHECK THIS STILL WORKS"
             motors.bot.reverse()
         else:
             path.line_correction(line_sensor_readings, "R")

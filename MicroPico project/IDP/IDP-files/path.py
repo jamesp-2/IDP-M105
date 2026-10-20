@@ -29,53 +29,6 @@ def line_correction(line_sensor_readings, direction = "F"):
             bot.reverse(30)
 
 
-def line_following(line_sensor_readings, read_sensors):
-    """Follow a line and classify junctions using a fresh-reading callback."""
-
-    # The middle sensors track the path; the outer pair flags a junction.
-    inner_sensors = [line_sensor_readings[1], line_sensor_readings[2]]
-    outer_sensors = [line_sensor_readings[0], line_sensor_readings[3]]
-
-    if outer_sensors != [0, 0]:
-        # A second sample is required to distinguish junction patterns.
-
-        # Let the classifier take a fresh sample after moving onto the junction.
-        junction = node(line_sensor_readings).decide_node_type(read_sensors)
-        print(junction)
-        if junction is not None:
-            # Navigation choices at junctions are not defined yet; keep the robot stopped.
-            bot.stop()
-            time.sleep(1)
-            if junction == "Right turn":
-                bot.forward()
-                time.sleep(0.3)
-                bot.turn("right")
-                time.sleep(1.8)
-            elif junction == "Left turn":
-                bot.forward()
-                time.sleep(0.3)
-                bot.turn("left")
-                time.sleep(1.5)
-            elif junction == "T junction":
-                bot.reverse()
-                time.sleep(0.5)
-                bot.turn("right")
-                time.sleep(7)
-            elif junction == "Cross junction":
-                pass
-            elif junction == "Right T junction":
-                pass
-            elif junction == "Left T junction":
-                pass
-
-    elif inner_sensors == [1, 1]:
-        # Both inner sensors see the line, so continue straight.
-        bot.forward(speed=60)
-    else:
-        # At least one inner sensor has lost the line; make one correction step.
-        line_correction(line_sensor_readings)
-
-
 #Compares current and next direction to turn bot
 #def turn_to_direction(current_direction, next_direction, reverse):
 
