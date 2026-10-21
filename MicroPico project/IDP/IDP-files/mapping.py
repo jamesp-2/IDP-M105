@@ -7,6 +7,17 @@ E=1
 S=2
 W=3
 
+paths = { 
+    "right pickup 1": ["straight", "left", "left into pickup"],
+    "right pickup 2": ["straight", "left", "straight", "left into pickup"],
+    "left pickup 1": ["straight", "right", "right into pickup"],
+    "left pickup 2": ["straight", "right", "straight", "right into pickup"],
+    "bottom right return": ["straight", "straight", "right", "straight"],
+    "bottom left return": ["straight", "straight", "left", "straight"], 
+    "top return": ["straight"],
+    }
+
+
 class rack():
     """Track the free and occupied slots for one rack location."""
 

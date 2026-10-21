@@ -37,37 +37,24 @@ def read_line_sensors():
     return [sensor.value() for sensor in sensors.track_sensors]
 
 
-def build_monday_route():
+def build_route(pickup_route, return_route):
     """Create the route pattern for the Monday test, including rack-based spacing."""
     # The route is a sequence of movement instructions. The early part of the
     # route moves through the pickup branch and then extends straight through the
     # rack area for as many slots as are currently available.
-    monday_test_route = [
-        "straight",
-        "left",
-        "left into pickup",
-        "right",
-        "straight",
-    ]
+    route = pickup_route
 
-    # Add the route length needed for the current rack configuration. This keeps
-    # the path aligned to the number of open slots before the delivery branch.
+    # NEED TO ADD LOGIC ABOUT HE SENSOR
+    #if pickup_route
     for _ in range(mapping.bottom_right_rack.first_available_slot()):
-        monday_test_route.append("straight")
+        route.append("straight")
 
     # Finish the route with the delivery section and return to the main track.
-    monday_test_route.extend([
-        "left into delivery",
-        "left",
-        "straight",
-        "straight",
-        "right",
-        "straight",
-    ])
-    return monday_test_route
+    route.extend(return_route)
+    return route
 
 
-def test_path(line_sensor_readings):
+def pathing(line_sensor_readings, pickup_route, return_route):
     """Check the current sensor state and follow the next route instruction."""
     global route_counter
 
@@ -80,14 +67,14 @@ def test_path(line_sensor_readings):
 
     # Rebuild the route each time so the path reflects the current rack state,
     # while keeping the progress counter separate from the route itself.
-    monday_test_route = build_monday_route()
+    route = build_route(pickup_route, return_route)
 
     # Once the route is complete, stop the robot and leave the loop to finish.
-    if route_counter >= len(monday_test_route):
+    if route_counter >= len(route):
         motors.bot.stop()
         return
 
-    route_following(outer_sensors, inner_sensors, monday_test_route, line_sensor_readings)
+    route_following(outer_sensors, inner_sensors, route, line_sensor_readings)
 
 
 def route_following(outer_sensors, inner_sensors, monday_test_route, line_sensor_readings):
@@ -167,7 +154,7 @@ def handle_junction(monday_test_route, line_sensor_readings):
         motors.bot.forward()
         time.sleep(0.7)
         motors.bot.stop()
-        time.sleep(1)
+        time.sleep(0.5)
         sys.exit()
 
 
@@ -275,6 +262,7 @@ def perform_task_move(direction, task_type):
     # Stop at the main-track junction so normal route following can continue.
     motors.bot.stop()
 
+
     # Pull in the global state variables so the robot can resume normal line
     # following after leaving the task area.
     global junction_handled, clear_sensor_samples
@@ -319,5 +307,5 @@ start_alignment("right")
 while True:
     readings = read_line_sensors()
     print(readings)
-    test_path(readings)
+    pathing(readings, mapping.paths.get("right pickup 1"), mapping.paths.get("bottom right return"))
     time.sleep_ms(25)
