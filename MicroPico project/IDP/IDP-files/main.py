@@ -10,13 +10,11 @@ from claw import close_claw, lift, lower, open_claw
 from config import button
 from path import *
 from mapping import *
-
+from leds import *
 
 
 def pick_bay(selection):
     return pick_up_locations[selection % len(pick_up_locations)]
-
-    
 
 
 def go_to_bay(box):
@@ -37,18 +35,24 @@ def main():
         if state == "wait_for_start":
             if button.value() == 1:
                 state = "operate"
+                
 
         elif state == "operate":
             # Look for work only after start; the detector is hardware-specific.
+            #Start flashing yellow pin
             bay = pick_bay(selection)
             follow_path(bay, current_direction, current_location)
             selection+=1
+            
             state = "pickup"
+
 
         elif state == "pickup":
             # Secure the detected item and raise it before attempting delivery.
             close_claw()
             lift()
+            #Check polarity
+            #Red/green constantly on 
             state = "deliver"
 
         elif state == "deliver":
@@ -66,3 +70,4 @@ def main():
 # Avoid starting the hardware workflow when this module is imported elsewhere.
 if __name__ == "__main__":
     main()
+

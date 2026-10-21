@@ -114,6 +114,14 @@ def get_path_from_start(chosen_location):
     return path_from_start[chosen_location]
 
 
+def rack_path(chosen_location):
+    intended_path = get_path_from_start(chosen_location)
+    if intended_path[0] == "E":
+        rack_location = first_available_slot(bottom_right_rack)
+    elif intended_path[0] == "W":
+        rack_location = first_available_slot(bottom_left_rack)
+    return
+
 def follow_path(chosen_location, current_direction, current_path):
 
     intended_path = get_path_from_start(chosen_location)
@@ -137,7 +145,7 @@ def follow_path(chosen_location, current_direction, current_path):
 
 
 
-#For extra points will return to start, implement later
+#For extra points will return to start
 def go_to_start(current_path, current_direction):
     return follow_path("START", current_direction, current_path)
 

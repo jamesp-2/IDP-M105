@@ -49,8 +49,8 @@ class LED:
         self.green.value(Off)
         self.yellow_on = False
 
-    def set_polarity(self, pole):
-        pole = get_magentic_reading
+    def set_polarity(self, pole=None):
+        pole = get_magentic_reading()
         """Show north polarity in red or south polarity in green."""
         if pole == "N":
             self.red.value(On)

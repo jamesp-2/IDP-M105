@@ -46,7 +46,7 @@ def lift():
 
 def open_claw():
     servo_claw.set_angle(270)
-    pass
+    return
 
 def lower():
     """Placeholder until the correct lowered angle is known for the lift."""
