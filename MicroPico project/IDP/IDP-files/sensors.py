@@ -27,14 +27,13 @@ def get_distance():
     pass
 
 hall_adc = ADC(hall_pin)
-zero_reading= 400
+zero_reading= 40000
 threshold = 9000
 
 def get_magentic_reading():
     total = 0
     for i in range(10):
-        total += hall_adc.read_u16()
-        print (hall_adc.read_u16())
+        total += (hall_adc.read_u16() - 40000)
     val = total/10
 
     print(val)

@@ -26,5 +26,4 @@ def get_magentic_reading():
 
     return None
 
-if __name__ == "__main__":
-    get_magnetic_reading()
+get_magentic_reading()
