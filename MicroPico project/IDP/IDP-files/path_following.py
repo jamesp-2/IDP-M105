@@ -37,17 +37,17 @@ def read_line_sensors():
     return [sensor.value() for sensor in sensors.track_sensors]
 
 
-def build_route(pickup_route, return_route):
+#def build_route(pickup_route, return_route):
     """Create the route pattern for the Monday test, including rack-based spacing."""
     # The route is a sequence of movement instructions. The early part of the
     # route moves through the pickup branch and then extends straight through the
     # rack area for as many slots as are currently available.
     route = pickup_route
 
-    # NEED TO ADD LOGIC ABOUT HE SENSOR
-    #if pickup_route
-    for _ in range(mapping.bottom_right_rack.first_available_slot()):
-        route.append("straight")
+    if pickup_route == mapping.paths.get("right pickup 1") or pickup_route == mapping.paths.get("right pickup 2"):
+        mag_polarity = get_magnetic_reading 
+        for _ in range(mapping.bottom_right_rack.first_available_slot()):
+            route.append("straight")
 
     # Finish the route with the delivery section and return to the main track.
     route.extend(return_route)

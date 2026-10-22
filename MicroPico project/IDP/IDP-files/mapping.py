@@ -1,6 +1,7 @@
 """Storage-rack occupancy and line-pattern junction classification."""
 from motors import *
 import time
+import sensors
 
 N=0
 E=1
@@ -12,10 +13,139 @@ paths = {
     "right pickup 2": ["straight", "left", "straight", "left into pickup"],
     "left pickup 1": ["straight", "right", "right into pickup"],
     "left pickup 2": ["straight", "right", "straight", "right into pickup"],
-    "bottom right return": ["straight", "straight", "right", "straight"],
-    "bottom left return": ["straight", "straight", "left", "straight"], 
-    "top return": ["straight"],
+    "bottom right return": ["straight", "straight", "right", "straight", "stop"],
+    "bottom left return": ["straight", "straight", "left", "straight", "stop"], 
+    "top return": ["straight", "stop"]
     }
+
+class route:
+    """Build and store the pickup, delivery, and return steps for one route."""
+
+    def __init__(self, pickup_path):
+        self.pickup_path = pickup_path
+        self.sel_route = []
+        self.floor = 0
+
+    def __repr__(self):
+        """Show the currently selected route steps."""
+        return f"route = {self.sel_route}"
+
+    def start_route(self):
+        """Start the selected route with its pickup steps."""
+        self.sel_route = list(self.pickup_path)
+        return self.sel_route
+
+    def delivery_pathfinding(self):
+        """Add delivery steps based on the pickup path and magnetic reading."""
+
+        # Right-side pickup paths.
+        if self.pickup_path == paths.get("right pickup 1"):
+            if sensors.get_magnetic_reading() == "N":
+                self.floor = 1
+                self.sel_route.extend(
+                    ["left", "right", "straight", "right", "straight"]
+                )
+                # Add one straight step for each slot before the first free slot.
+                for _ in range(top_right_rack.first_available_slot()):
+                    self.sel_route.append("straight")
+                self.sel_route.append("right into delivery")
+            elif sensors.get_magnetic_reading() == "S":
+                self.sel_route.extend(["right", "straight"])
+                # Add one straight step for each slot before the first free slot.
+                for _ in range(bottom_right_rack.first_available_slot()):
+                    self.sel_route.append("straight")
+                self.sel_route.append("left into delivery")
+            else:
+                self.sel_route.extend(["left", "right", "straight"])
+
+        elif self.pickup_path == paths.get("right pickup 2"):
+            if sensors.get_magnetic_reading() == "N":
+                self.floor = 1
+                self.sel_route.extend(
+                    ["left", "straight", "right", "straight", "right", "straight"]
+                )
+                # Add one straight step for each slot before the first free slot.
+                for _ in range(top_right_rack.first_available_slot()):
+                    self.sel_route.append("straight")
+                self.sel_route.append("right into delivery")
+            elif sensors.get_magnetic_reading() == "S":
+                self.sel_route.extend("right")
+                # Add one straight step for each slot before the first free slot.
+                for _ in range(bottom_right_rack.first_available_slot()):
+                    self.sel_route.append("straight")
+                self.sel_route.append("left into delivery")
+            else:
+                self.sel_route.extend(["left", "straight", "right", "straight"])
+
+        # Left-side pickup paths.
+        elif self.pickup_path == paths.get("left pickup 1"):
+            if sensors.get_magnetic_reading() == "N":
+                self.floor = 1
+                self.sel_route.extend(["right", "left", "straight", "left", "straight"])
+                # Add one straight step for each slot before the first free slot.
+                for _ in range(top_left_rack.first_available_slot()):
+                    self.sel_route.append("straight")
+                self.sel_route.append("left into delivery")
+            elif sensors.get_magnetic_reading() == "S":
+                self.sel_route.extend(["left", "straight"])
+                # Add one straight step for each slot before the first free slot.
+                for _ in range(bottom_right_rack.first_available_slot()):
+                    self.sel_route.append("straight")
+                self.sel_route.append("right into delivery")
+            else:
+                self.sel_route.extend(["right", "left", "straight"])
+
+        elif self.pickup_path == paths.get("left pickup 2"):
+            if sensors.get_magnetic_reading() == "N":
+                self.floor = 1
+                self.sel_route.extend(
+                    ["right", "straight", "left", "straight", "left", "straight"]
+                )
+                # Add one straight step for each slot before the first free slot.
+                for _ in range(top_left_rack.first_available_slot()):
+                    self.sel_route.append("straight")
+                self.sel_route.append("left into delivery")
+            elif sensors.get_magnetic_reading() == "S":
+                self.sel_route.extend(["left", "straight"])
+                # Add one straight step for each slot before the first free slot.
+                for _ in range(bottom_right_rack.first_available_slot()):
+                    self.sel_route.append("straight")
+                self.sel_route.append("right into delivery")
+            else:
+                self.sel_route.extend(["right", "left", "straight"])
+
+    def return_pathfinding(self):
+        """Add return steps based on the delivery floor and entry direction."""
+
+        # Return from the upper floor to the top return path.
+        if self.floor == 1:
+            if self.sel_route[-1] == "right into delivery":
+                self.sel_route.append("right")
+                # Add straight steps to reach the first free slot.
+                for _ in range(top_right_rack.first_available_slot() - 1):
+                    self.sel_route.append("straight")
+            elif self.sel_route[-1] == "left into delivery":
+                self.sel_route.append("left")
+                # Add straight steps to reach the first free slot.
+                for _ in range(top_left_rack.first_available_slot() - 1):
+                    self.sel_route.append("straight")
+            self.sel_route.extend(paths["top return"])
+
+        # Return from the lower floor using the matching bottom return path.
+        else:
+            if self.sel_route[-1] == "right into delivery":
+                self.sel_route.append("right")
+                # Add straight steps to reach the first free slot.
+                for _ in range(bottom_left_rack.first_available_slot() - 1):
+                    self.sel_route.append("straight")
+                self.sel_route.extend(paths["bottom left return"])
+            elif self.sel_route[-1] == "left into delivery":
+                self.sel_route.append("left")
+                # Add straight steps to reach the first free slot.
+                for _ in range(bottom_right_rack.first_available_slot() - 1):
+                    self.sel_route.append("straight")
+                self.sel_route.extend(paths["bottom right return"])
+    
 
 
 class rack():
@@ -118,7 +248,4 @@ path_from_start ={
 
 pick_up_locations = ["P1","P2","P3","P4"]
 current_selection = 0
-
-
-
 

@@ -30,7 +30,7 @@ hall_adc = ADC(hall_pin)
 zero_reading= 40000
 threshold = 9000
 
-def get_magentic_reading():
+def get_magnetic_reading():
     total = 0
     for i in range(10):
         total += (hall_adc.read_u16() - 40000)
