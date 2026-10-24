@@ -23,10 +23,10 @@ class Servo:
 
     def set_angle(self, angle):
         """Set the servo angle, clamping requests to its defined travel."""
-        if angle < 0:
-            angle = 0
-        if angle > 270:
-            angle = 270
+        if angle < 170:
+            angle = 170
+        if angle > 200:
+            angle = 200
 
         # Linearly interpolate a PWM duty value between the endpoint duties.
         duty = int(Servo.MIN_DUTY + (angle / 270) * (Servo.MAX_DUTY - Servo.MIN_DUTY))
@@ -37,17 +37,21 @@ servo_claw = Servo(Pin(servo_1))
 servo_lift = Servo(Pin(servo_2))
 
 def close_claw():
-    servo_claw.set_angle(0)
-    pass
+    servo_claw.set_angle(17)
+    return
 
 def lift():
-    """Placeholder until the correct raised angle is known for the lift."""
-    pass
+    servo_lift.set_angle(195)
+    return
 
 def open_claw():
-    servo_claw.set_angle(270)
+    servo_claw.set_angle(200)
+    return
+
+def open_claw_small():
+    servo_claw.set_angle(187)
     return
 
 def lower():
-    """Placeholder until the correct lowered angle is known for the lift."""
-    pass
+    servo_lift.set_angle(180)
+    return

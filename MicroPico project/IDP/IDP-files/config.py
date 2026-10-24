@@ -15,23 +15,23 @@ green_pin = 22
 
 # Servo control pins.
 servo_1 = 15
-servo_2 = 28
+servo_2 = 28 #Double check this works
 
 # Sensor input pins.
 hall_pin = 27 #Analogue
-crash_pin_1 = 17
-crash_pin_2 = 18
-IR_pin = 26 #Analogue
+crash_pin_1 = 0
+crash_pin_2 = 0
+ir_pin = 26 #Analogue
 
 # I2C pins used by the distance sensor.
-sda_pin = 12
-scl_pin = 13
+sda_pin = 18
+scl_pin = 19
 
 # Start button input with a pull-down resistor enabled.
 button = Pin(28, Pin.IN, Pin.PULL_DOWN)
 
 # Four line-tracking sensor input pins.
-track_1 = 0
+track_1 = 10
 track_2 = 1
 track_3 = 12
 track_4 = 13
