@@ -14,6 +14,7 @@ import time
 import mapping
 import path
 import sensors
+import claw
 
 # ---------------------------------------------------------------------------
 # The robot uses a simple state machine for the Monday route test.
@@ -27,6 +28,7 @@ route_counter = 0
 junction_handled = False
 clear_sensor_samples = 0
 CLEAR_SAMPLES_REQUIRED = 10
+active_route = None
 
 
 def read_line_sensors():
@@ -37,26 +39,23 @@ def read_line_sensors():
     return [sensor.value() for sensor in sensors.track_sensors]
 
 
-#def build_route(pickup_route, return_route):
-    """Create the route pattern for the Monday test, including rack-based spacing."""
-    # The route is a sequence of movement instructions. The early part of the
-    # route moves through the pickup branch and then extends straight through the
-    # rack area for as many slots as are currently available.
-    route = pickup_route
-
-    if pickup_route == mapping.paths.get("right pickup 1") or pickup_route == mapping.paths.get("right pickup 2"):
-        mag_polarity = get_magnetic_reading 
-        for _ in range(mapping.bottom_right_rack.first_available_slot()):
-            route.append("straight")
-
-    # Finish the route with the delivery section and return to the main track.
-    route.extend(return_route)
-    return route
+def build_route(pickup_path):
+    """Build a complete pickup, delivery, and return route."""
+    route_plan = mapping.route(pickup_path)
+    route_plan.start_route()
+    route_plan.delivery_pathfinding()
+    route_plan.return_pathfinding()
+    return route_plan
 
 
-def pathing(line_sensor_readings, pickup_route, return_route):
+def pathing(line_sensor_readings, pickup_route):
     """Check the current sensor state and follow the next route instruction."""
-    global route_counter
+    global route_counter, active_route
+
+    # Route selection depends on the magnetic reading and rack state, so build it
+    # once and keep using the same instruction list as the robot progresses.
+    if active_route is None:
+        active_route = build_route(pickup_route)
 
     # The robot needs to differentiate between a centre-line correction and a
     # junction. The inner sensors sit on the line itself, while the outer sensors
@@ -65,9 +64,7 @@ def pathing(line_sensor_readings, pickup_route, return_route):
     inner_sensors = [line_sensor_readings[1], line_sensor_readings[2]]
     outer_sensors = [line_sensor_readings[0], line_sensor_readings[3]]
 
-    # Rebuild the route each time so the path reflects the current rack state,
-    # while keeping the progress counter separate from the route itself.
-    route = build_route(pickup_route, return_route)
+    route = active_route.sel_route
 
     # Once the route is complete, stop the robot and leave the loop to finish.
     if route_counter >= len(route):
@@ -233,10 +230,11 @@ def perform_task_move(direction, task_type):
 
     motors.bot.stop()
     if task_type == "pickup":
-        # Box pickup goes here.
-        pass
+        claw.close_claw()
+        claw.lift()
     else:
-        # Box delivery goes here.
+        claw.lower()
+        claw.open_claw()
         pass
 
     # Reverse-follow the line until the robot has cleared the task zone and
@@ -251,7 +249,7 @@ def perform_task_move(direction, task_type):
             break
 
         inner_sensors = [line_sensor_readings[1], line_sensor_readings[2]]
-        if inner_sensors == [1, 1] or inner_sensors == [0, 0]: "CHECK THIS STILL WORKS"
+        if inner_sensors == [1, 1] or inner_sensors == [0, 0]:
             motors.bot.reverse()
         else:
             path.line_correction(line_sensor_readings, "R")
@@ -307,5 +305,5 @@ start_alignment("right")
 while True:
     readings = read_line_sensors()
     print(readings)
-    pathing(readings, mapping.paths.get("right pickup 1"), mapping.paths.get("bottom right return"))
+    pathing(readings, mapping.paths.get("right pickup 1"))
     time.sleep_ms(25)
