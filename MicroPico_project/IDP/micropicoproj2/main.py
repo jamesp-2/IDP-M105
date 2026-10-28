@@ -10,12 +10,14 @@ import path
 import sensors
 import claw
 import config
+from leds import *
 
 route_counter = 0
 active_route = None
 junction_handled = False
 clear_sensor_samples = 0
 CLEAR_SAMPLES_REQUIRED = 10
+led = LED()
 
 
 def read_line_sensors():
@@ -215,9 +217,11 @@ def perform_task_move(direction, task_type):
     if task_type == "pickup":
         claw.close_claw()
         claw.lift_small()
+        led.set_polarity()
     else:
         claw.lower()
         claw.open_claw_small()
+        led.flash()
 
     # Reverse-follow the line until the robot has cleared the task zone and
     # reaches the outer sensors at the main-track junction.
@@ -283,6 +287,7 @@ if config.button.value() == 1:
 # This calibration step keeps the robot centred before it begins following the
 # route-based movement sequence.
     start_alignment("right")
+    led.flash()
     claw.lower()
     claw.open_claw()
 
