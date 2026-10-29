@@ -10,6 +10,7 @@ import path
 import sensors
 import claw
 import config
+from leds import *
 
 route_counter = 0
 active_route = None
@@ -184,20 +185,11 @@ def perform_task_move(direction, task_type, active_route):
 
     motors.bot.stop()
     if task_type == "pickup":
-        time.sleep(0.5)
-        claw.open_claw()
-        print("lifting")
-        claw.lift()
-
-        active_route.delivery_pathfinding()
-        active_route.return_pathfinding()
-
-    #elif slot_state == 1:
-        #pass
+        claw.close_claw()
+        claw.lift_small()
     else:
-        claw.lower_small()
-        claw.close_claw_small()
-
+        claw.lower()
+        claw.open_claw_small()
 
     line_sensor_readings = read_line_sensors()
     task_zone_cleared = False
@@ -250,17 +242,17 @@ def start_alignment(direction):
     motors.bot.stop()
 
 
-task_list = [
-    "right pickup 1",
-    "left pickup 1",
-    "right pickup 2",
-    "left pickup 2",
-]
 
-time.sleep(3)
-start_alignment("right")
-claw.lower()
-claw.close_claw()
+if config.button.value() == 1:  
+# Give the robot a brief pause before calibration so the hardware has time to
+# settle after power-up.
+    time.sleep(3)
+# Start the robot aligned with the line before entering the main test loop.
+# This calibration step keeps the robot centred before it begins following the
+# route-based movement sequence.
+    start_alignment("right")
+    claw.lower()
+    claw.open_claw()
 
 while True:
     if current_pickup_index >= len(task_list):
