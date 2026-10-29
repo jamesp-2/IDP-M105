@@ -51,7 +51,7 @@ class LED:
 
     def set_polarity(self, pole):
 
-        #pole = get_magnetic_reading()
+        pole = get_magnetic_reading()
         """Show north polarity in red or south polarity in green."""
         if pole == "N":
             self.red.value(On)

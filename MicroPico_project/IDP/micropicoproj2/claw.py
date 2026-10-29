@@ -57,7 +57,7 @@ def open_claw_small():
     return
 
 def lower():
-    servo_lift.set_angle(190)
+    servo_lift.set_angle(210)
     return
 
 def close_claw_small():
