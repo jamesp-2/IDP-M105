@@ -246,11 +246,6 @@ def start_alignment(direction):
     time.sleep(0.2)
     motors.bot.stop()
 
-task_list = ["right pickup 1",
-            "left pickup 1",
-            "right pickup 2",
-            "left pickup 2"]
-
 time.sleep(2)
 if config.button.value() == 1:
 
@@ -259,14 +254,14 @@ if config.button.value() == 1:
     claw.close_claw()
 
     while True:
-        if current_pickup_index >= len(task_list):
+        if current_pickup_index >= len(mapping.task_list):
             motors.bot.stop()
             break
 
         readings = read_line_sensors()
         print(readings)
 
-        current_task_name = task_list[current_pickup_index]
+        current_task_name = mapping.task_list[current_pickup_index]
         current_pickup_path = mapping.paths.get(current_task_name)
         print(current_pickup_path)
         pathing(readings, current_pickup_path)

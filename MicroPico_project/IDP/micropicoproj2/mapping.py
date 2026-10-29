@@ -3,6 +3,7 @@ from motors import *
 import time
 import sensors
 
+
 # Compass directions
 N = 0
 E = 1
@@ -16,10 +17,15 @@ paths = {
     "left pickup 1": ["straight", "right", "right into pickup"],
     "left pickup 2": ["straight", "right", "straight", "right into pickup"],
     "bottom right return": ["straight", "straight", "right", "straight", "straight"],
-    "bottom left return": ["straight", "straight", "left", "straight", "straights"],
-    "top return": ["straight"],
+    "bottom left return": ["straight", "straight", "left", "straight", "straight"],
+    "top right return": ["straight", "right"],
+    "top left return": ["straight", "left"]
 }
 
+task_list = ["right pickup 1",
+            "left pickup 1",
+            "right pickup 2",
+            "left pickup 2"]
 
 class route:
     """Store and extend one pickup, delivery, and return route."""
@@ -116,11 +122,12 @@ class route:
                 self.sel_route.append("right")
                 for _ in range(top_right_rack.first_available_slot() - 1):
                     self.sel_route.append("straight")
+                self.sel_route.extend(paths["top right return"])
             elif self.sel_route[-1] == "left into delivery":
                 self.sel_route.append("left")
                 for _ in range(top_left_rack.first_available_slot() - 1):
                     self.sel_route.append("straight")
-            self.sel_route.extend(paths["top return"])
+                self.sel_route.extend(paths["top left return"])
         else:
             if self.sel_route[-1] == "right into delivery":
                 self.sel_route.append("right")
