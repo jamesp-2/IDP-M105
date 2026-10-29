@@ -41,7 +41,7 @@ def close_claw():
     servo_claw.set_angle(163)
 
 def lift():
-    servo_lift.set_angle(215)
+    servo_lift.set_angle(220)
     return
 
 def lift_small():
@@ -57,6 +57,13 @@ def open_claw_small():
     return
 
 def lower():
-    servo_lift.set_angle(195)
+    servo_lift.set_angle(190)
     return
 
+def close_claw_small():
+    servo_claw.set_angle(180)
+    return
+
+def lower_small():
+    servo_lift.set_angle(200)
+    return

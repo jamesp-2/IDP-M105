@@ -49,8 +49,9 @@ class LED:
         self.green.value(Off)
         self.yellow_on = False
 
-    def set_polarity(self, pole=None):
-        pole = get_magnetic_reading()
+    def set_polarity(self, pole):
+
+        #pole = get_magnetic_reading()
         """Show north polarity in red or south polarity in green."""
         if pole == "N":
             self.red.value(On)
@@ -75,3 +76,15 @@ class LED:
             self.yellow_on = not self.yellow_on
             self.yellow.value(On if self.yellow_on else Off)
 
+
+# led = LED()
+# led.start()
+# time.sleep(0.5)
+# start = time.time()
+# while time.time() - start < 5:
+#     led.flash()
+# led.set_polarity("N")
+# time.sleep(2)
+# led.set_polarity("S")
+# time.sleep(2)
+# led.stop()

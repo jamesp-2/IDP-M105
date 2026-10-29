@@ -16,40 +16,32 @@ active_route = None
 junction_handled = False
 clear_sensor_samples = 0
 CLEAR_SAMPLES_REQUIRED = 10
+current_pickup_index = 0
 
 
 def read_line_sensors():
-    """Return the current values in left-to-right sensor order."""
+    """Return the current line sensor values from left to right."""
     return [sensor.value() for sensor in sensors.track_sensors]
 
 
 def build_route(pickup_path):
-    """Create the route pattern"""
+    """Build the route plan for the selected pickup path."""
     route_plan = mapping.route(pickup_path)
     route_plan.start_route()
-    route_plan.delivery_pathfinding()
-    route_plan.return_pathfinding()
     return route_plan
 
+
 def pathing(line_sensor_readings, pickup_route):
-    """Check the current sensor state and follow the next route instruction."""
+    """Follow the next instruction or correct the robot on the track."""
     global route_counter, active_route
 
     if active_route is None:
         active_route = build_route(pickup_route)
 
-    # The robot needs to differentiate between a centre-line correction and a
-    # junction. The inner sensors sit on the line itself, while the outer sensors
-    # tell us when the robot has reached the edge of a tape segment or a wider
-    # junction area.
     inner_sensors = [line_sensor_readings[1], line_sensor_readings[2]]
     outer_sensors = [line_sensor_readings[0], line_sensor_readings[3]]
-
-    # Rebuild the route each time so the path reflects the current rack state,
-    # while keeping the progress counter separate from the route itself.
     route = active_route.sel_route
 
-    # Once the route is complete, stop the robot and leave the loop to finish.
     if route_counter >= len(route):
         motors.bot.stop()
         return
@@ -57,58 +49,44 @@ def pathing(line_sensor_readings, pickup_route):
     route_following(outer_sensors, inner_sensors, route, line_sensor_readings)
 
 
-def route_following(outer_sensors, inner_sensors, monday_test_route, line_sensor_readings):
-    """Handle either a junction or a normal line-correction update."""
+def route_following(outer_sensors, inner_sensors, route_plan, line_sensor_readings):
+    """Handle a junction or keep the robot centred on the line."""
     global route_counter, junction_handled, clear_sensor_samples
 
-    # If both outer sensors are off, the robot is likely in a clear section of
-    # tape with no junction. Wait for several samples to confirm the robot has
-    # truly left the junction area before re-enabling junction handling.
     if outer_sensors == [0, 0]:
         clear_sensor_samples += 1
         if clear_sensor_samples >= CLEAR_SAMPLES_REQUIRED:
             junction_handled = False
     elif junction_handled:
-        # A junction was already handled, so do not trigger it again while the
-        # robot remains in the same portion of the track.
         clear_sensor_samples = 0
         return
     else:
         clear_sensor_samples = 0
 
-    # If there is a junction, execute the next route instruction; otherwise keep
-    # the robot centred on the line.
     if outer_sensors != [0, 0]:
-        handle_junction(monday_test_route, line_sensor_readings)
+        handle_junction(route_plan, line_sensor_readings)
     elif inner_sensors == [1, 1]:
         motors.bot.forward()
     else:
         path.line_correction(line_sensor_readings)
 
 
-def handle_junction(monday_test_route, line_sensor_readings):
-    """Execute the next movement for the current junction instruction."""
-    global route_counter, junction_handled, clear_sensor_samples
+def handle_junction(route_plan, line_sensor_readings):
+    """Execute the next movement for the current route instruction."""
+    global route_counter, junction_handled, clear_sensor_samples, active_route, current_pickup_index
 
-    # Once a junction is triggered, suppress repeat handling until the robot is
-    # back on a clear section of the track.
     junction_handled = True
     clear_sensor_samples = 0
     print("junction")
 
-    # Stop briefly before turning so the next movement is precise and does not
-    # start while the robot is still drifting from the last line-correction.
     motors.bot.stop()
     motors.bot.forward()
-    time.sleep(0.45)
+    time.sleep(0.4)
 
-    # Read the current route step and perform the matching movement. After the
-    # action completes, advance the route counter so the next junction uses the
-    # next instruction.
-    action = monday_test_route[route_counter]
+    action = route_plan[route_counter]
 
     if action == "straight":
-        perform_straight_move(line_sensor_readings)
+        perform_straight_move()
     elif action == "left":
         perform_turn("left")
     elif action == "right":
@@ -116,42 +94,38 @@ def handle_junction(monday_test_route, line_sensor_readings):
     elif action == "reverse":
         perform_reverse_move(line_sensor_readings)
     elif action == "left into pickup":
-        perform_task_move("left", "pickup")
+        perform_task_move("left", "pickup", active_route)
     elif action == "right into pickup":
-        perform_task_move("right", "pickup")
+        perform_task_move("right", "pickup", active_route)
     elif action == "left into delivery":
-        perform_task_move("left", "delivery")
+        perform_task_move("left", "delivery", active_route)
     elif action == "right into delivery":
-        perform_task_move("right", "delivery")
+        perform_task_move("right", "delivery", active_route)
 
     route_counter += 1
 
-    # Print the next route step for debugging. When the final instruction has been
-    # reached, stop the robot and exit the script cleanly.
-    if route_counter < len(monday_test_route):
-        print(monday_test_route[route_counter])
+    if route_counter < len(route_plan):
+        print(route_plan[route_counter])
     else:
         motors.bot.forward()
         time.sleep(0.7)
         motors.bot.stop()
-        time.sleep(0.5)
-        sys.exit()
+
+        global active_route, current_pickup_index
+        active_route = None
+        route_counter = 0
+        current_pickup_index += 1
 
 
-def perform_straight_move(line_sensor_readings):
-    """Continue straight while centring on the line."""
+def perform_straight_move():
+    """Keep moving straight through a junction."""
     print("straight")
-    # Continue driving forward while allowing the line-correction logic to keep
-    # the robot centred on the tape.
     motors.bot.forward()
-    path.line_correction(line_sensor_readings)
 
 
 def perform_turn(direction):
-    """Turn in the given direction until the centre sensors detect the line again."""
+    """Turn until the centre sensors find the line again."""
     print(direction)
-    # Start the turn, wait a moment for the robot to commit to the arc, then
-    # stop and continue rotating until the centre sensors are aligned again.
     motors.bot.turn(direction)
     time.sleep(0.8)
     motors.bot.stop()
@@ -167,29 +141,28 @@ def perform_turn(direction):
 
 
 def perform_reverse_move(line_sensor_readings):
-    """Reverse and then re-centre on the line."""
+    """Reverse and pull the robot back onto the line."""
     print("reverse")
-    # Reverse-drive while using the line-correction logic in reverse mode to pull
-    # the robot back onto the centre of the line.
     path.line_correction(line_sensor_readings, "R")
     motors.bot.reverse()
 
 
-def perform_task_move(direction, task_type):
-    """Turn into a task zone and hold until the required sensor target is reached."""
+def perform_task_move(direction, task_type, active_route):
+    """Enter the task zone and wait until the target sensor pattern is reached."""
+    global route_counter, junction_handled, clear_sensor_samples
+
     task_type = task_type.lower()
     if task_type not in ("pickup", "delivery"):
         raise ValueError("task_type must be 'pickup' or 'delivery'")
 
-    # A pickup task is reached when all sensors see the line. A delivery task is
-    # reached only once the robot is in the clear section beyond the task area.
-    target_sensor_state = [1, 1, 1, 1] if task_type == "pickup" else [0, 0, 0, 0]
+    if task_type == "pickup":
+        target_sensor_state = [1, 1, 1, 1]
+    else:
+        target_sensor_state = [0, 0, 0, 0]
     print(task_type)
 
-    # Turn into the target task area and continue until the robot is centred on
-    # the line again before seeking the target sensor state.
     motors.bot.turn(direction)
-    time.sleep(0.8)
+    time.sleep(1)
 
     line_sensor_readings = read_line_sensors()
     inner_sensors = [line_sensor_readings[1], line_sensor_readings[2]]
@@ -200,8 +173,6 @@ def perform_task_move(direction, task_type):
     motors.bot.turn(direction)
     time.sleep(0.1)
 
-    # Continue until the target sensor state is reached. Pickup uses all sensors
-    # active, while delivery waits for the robot to reach the clear sensor state.
     while line_sensor_readings != target_sensor_state:
         inner_sensors = [line_sensor_readings[1], line_sensor_readings[2]]
         if inner_sensors == [1, 1]:
@@ -213,14 +184,21 @@ def perform_task_move(direction, task_type):
 
     motors.bot.stop()
     if task_type == "pickup":
-        claw.close_claw()
-        claw.lift_small()
-    else:
-        claw.lower()
-        claw.open_claw_small()
+        time.sleep(0.5)
+        claw.open_claw()
+        print("lifting")
+        claw.lift()
 
-    # Reverse-follow the line until the robot has cleared the task zone and
-    # reaches the outer sensors at the main-track junction.
+        active_route.delivery_pathfinding()
+        active_route.return_pathfinding()
+
+    #elif slot_state == 1:
+        #pass
+    else:
+        claw.lower_small()
+        claw.close_claw_small()
+
+
     line_sensor_readings = read_line_sensors()
     task_zone_cleared = False
     while True:
@@ -239,32 +217,30 @@ def perform_task_move(direction, task_type):
         time.sleep_ms(25)
         line_sensor_readings = read_line_sensors()
 
-    # Stop at the main-track junction so normal route following can continue.
     motors.bot.stop()
 
+    #if slot_state == 1:
+        #if direction == "left":
+            #perform_turn("right")
+        #else:
+            #perform_turn("left")
 
-    # Pull in the global state variables so the robot can resume normal line
-    # following after leaving the task area.
-    global junction_handled, clear_sensor_samples
-
-    # Manually reset the flags so the software knows the previous turn is
-    # finished and it is allowed to read the tape it is currently sitting on.
     junction_handled = False
     clear_sensor_samples = CLEAR_SAMPLES_REQUIRED
+    if task_type == "delivery":
+        claw.lower()
+        active_route.target_rack.slot_is_full(active_route.target_rack.first_available_slot())
 
 
 def start_alignment(direction):
-    """Rotate the robot until the centre sensors detect the line and stop."""
-    # Use a short turn to bring the robot onto the line before the official route
-    # starts. Once the centre sensors both see the line, stop the rotation and
-    # leave the robot in a known starting pose.
+    """Rotate until the centre sensors find the line and stop."""
     motors.bot.turn(direction)
     time.sleep(0.5)
 
     line_sensor_readings = read_line_sensors()
     inner_sensors = [line_sensor_readings[1], line_sensor_readings[2]]
     while inner_sensors != [1, 1]:
-        print([line_sensor_readings[0],line_sensor_readings[1], line_sensor_readings[2], line_sensor_readings[3]])
+        print([line_sensor_readings[0], line_sensor_readings[1], line_sensor_readings[2], line_sensor_readings[3]])
         motors.bot.turn(direction)
         line_sensor_readings = read_line_sensors()
         inner_sensors = [line_sensor_readings[1], line_sensor_readings[2]]
@@ -274,23 +250,28 @@ def start_alignment(direction):
     motors.bot.stop()
 
 
+task_list = [
+    "right pickup 1",
+    "left pickup 1",
+    "right pickup 2",
+    "left pickup 2",
+]
 
-if config.button.value() == 1:  
-# Give the robot a brief pause before calibration so the hardware has time to
-# settle after power-up.
-    time.sleep(3)
-# Start the robot aligned with the line before entering the main test loop.
-# This calibration step keeps the robot centred before it begins following the
-# route-based movement sequence.
-    start_alignment("right")
-    claw.lower()
-    claw.open_claw()
+time.sleep(3)
+start_alignment("right")
+claw.lower()
+claw.close_claw()
 
-# Main control loop for the line-following test.
-# Each pass samples the sensors and executes the next route instruction or line
-# correction as needed.
-    while True:
-        readings = read_line_sensors()
-        print(readings)
-        pathing(readings, mapping.paths.get("right pickup 1"))
-        time.sleep_ms(25)
+while True:
+    if current_pickup_index >= len(task_list):
+        motors.bot.stop()
+        break
+
+    readings = read_line_sensors()
+    print(readings)
+
+    current_task_name = task_list[current_pickup_index]
+    current_pickup_path = mapping.paths.get(current_task_name)
+    print(current_pickup_path)
+    pathing(readings, current_pickup_path)
+    time.sleep_ms(25)

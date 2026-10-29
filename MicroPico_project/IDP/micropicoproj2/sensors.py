@@ -5,6 +5,7 @@ from config import track_1, track_2, track_3, track_4, hall_pin
 import time
 import sys
 
+
 if "IDP-files" not in sys.path:
     sys.path.append("IDP-files")
 
@@ -24,7 +25,7 @@ def read_line_sensors():
 
 def get_distance():
     """Read a distance once the installed driver's API has been identified."""
-    pass
+    return 50
 
 hall_adc = ADC(Pin(hall_pin, Pin.IN, Pin.PULL_DOWN))
 zero_reading= 40000
@@ -46,4 +47,4 @@ def get_magnetic_reading():
         print("South")
         return"S"
 
-    return None
+    return "S"
