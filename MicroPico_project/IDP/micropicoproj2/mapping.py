@@ -15,9 +15,9 @@ paths = {
     "right pickup 2": ["straight", "left", "straight", "left into pickup"],
     "left pickup 1": ["straight", "right", "right into pickup"],
     "left pickup 2": ["straight", "right", "straight", "right into pickup"],
-    "bottom right return": ["straight", "straight", "right", "straight", "stop"],
-    "bottom left return": ["straight", "straight", "left", "straight", "stop"],
-    "top return": ["straight", "stop"],
+    "bottom right return": ["straight", "straight", "right", "straight", "straight"],
+    "bottom left return": ["straight", "straight", "left", "straight", "straights"],
+    "top return": ["straight"],
 }
 
 

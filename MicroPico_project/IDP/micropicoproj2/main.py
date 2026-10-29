@@ -110,8 +110,6 @@ def handle_junction(route_plan, line_sensor_readings):
     if route_counter < len(route_plan):
         print(route_plan[route_counter])
     else:
-        motors.bot.forward()
-        time.sleep(0.7)
         motors.bot.stop()
 
         global active_route, current_pickup_index
@@ -187,8 +185,9 @@ def perform_task_move(direction, task_type, active_route):
 
     motors.bot.stop()
     if task_type == "pickup":
-        time.sleep(0.5)
+        time.sleep(0.2)
         claw.open_claw()
+        time.sleep(0.1)
         claw.lift()
 
         active_route.delivery_pathfinding()
@@ -252,28 +251,24 @@ task_list = ["right pickup 1",
             "right pickup 2",
             "left pickup 2"]
 
+time.sleep(2)
+if config.button.value() == 1:
 
-#Give the robot a brief pause before calibration so the hardware has time to
-# settle after power-up.
-time.sleep(3)
-# Start the robot aligned with the line before entering the main test loop.
-# This calibration step keeps the robot centred before it begins following the
-# route-based movement sequence.
-start_alignment("right")
-claw.lower()
-claw.close_claw()
+    start_alignment("right")
+    claw.lower()
+    claw.close_claw()
 
-while True:
-    if current_pickup_index >= len(task_list):
-        motors.bot.stop()
-        break
+    while True:
+        if current_pickup_index >= len(task_list):
+            motors.bot.stop()
+            break
 
-    readings = read_line_sensors()
-    print(readings)
+        readings = read_line_sensors()
+        print(readings)
 
-    current_task_name = task_list[current_pickup_index]
-    current_pickup_path = mapping.paths.get(current_task_name)
-    print(current_pickup_path)
-    pathing(readings, current_pickup_path)
-    time.sleep_ms(25)
+        current_task_name = task_list[current_pickup_index]
+        current_pickup_path = mapping.paths.get(current_task_name)
+        print(current_pickup_path)
+        pathing(readings, current_pickup_path)
+        time.sleep_ms(25)
 
