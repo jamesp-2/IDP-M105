@@ -84,7 +84,7 @@ def handle_junction(route_plan, line_sensor_readings):
 
     motors.bot.stop()
     motors.bot.forward()
-    time.sleep(0.4)
+    time.sleep(0.43)
 
     action = route_plan[route_counter]
 
@@ -128,7 +128,7 @@ def perform_turn(direction):
     """Turn until the centre sensors find the line again."""
     print(direction)
     motors.bot.turn(direction)
-    time.sleep(0.8)
+    time.sleep(2.0)
     motors.bot.stop()
 
     line_sensor_readings = read_line_sensors()
@@ -152,7 +152,6 @@ def perform_task_move(direction, task_type, active_route):
     """Enter the task zone and wait until the target sensor pattern is reached."""
     global route_counter, junction_handled, clear_sensor_samples
 
-    task_type = task_type.lower()
     if task_type not in ("pickup", "delivery"):
         raise ValueError("task_type must be 'pickup' or 'delivery'")
 
@@ -163,7 +162,7 @@ def perform_task_move(direction, task_type, active_route):
     print(task_type)
 
     motors.bot.turn(direction)
-    time.sleep(1)
+    time.sleep(1.5)
 
     line_sensor_readings = read_line_sensors()
     inner_sensors = [line_sensor_readings[1], line_sensor_readings[2]]
@@ -185,6 +184,7 @@ def perform_task_move(direction, task_type, active_route):
 
     motors.bot.stop()
     if task_type == "pickup":
+        claw.lower()
         time.sleep(0.2)
         claw.open_claw()
         time.sleep(0.1)
@@ -226,7 +226,8 @@ def perform_task_move(direction, task_type, active_route):
     junction_handled = False
     clear_sensor_samples = CLEAR_SAMPLES_REQUIRED
     if task_type == "delivery":
-        claw.lower()
+        claw.lift()
+        claw.close_claw()
 
 
 def start_alignment(direction):
@@ -250,10 +251,11 @@ time.sleep(2)
 if config.button.value() == 1:
 
     start_alignment("right")
-    claw.lower()
+    claw.lift()
     claw.close_claw()
 
     while True:
+        led.flash()
         if current_pickup_index >= len(mapping.task_list):
             motors.bot.stop()
             break
@@ -266,4 +268,5 @@ if config.button.value() == 1:
         print(current_pickup_path)
         pathing(readings, current_pickup_path)
         time.sleep_ms(25)
+
 

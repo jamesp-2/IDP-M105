@@ -68,12 +68,13 @@ def get_magnetic_reading():
 
     print(val)
 
-    if val > 50000:
-        print("North")
-        return "N"
+    #if val > 50000:
+        #print("North")
+        #return "N"
 
-    elif val < 30000:
-        print("South")
-        return"S"
-    return "S"
+    #elif val < 30000:
+        #print("South")
+        #return"S"
+    return "N"
+
 
