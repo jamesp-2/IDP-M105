@@ -128,7 +128,7 @@ def perform_turn(direction):
     """Turn until the centre sensors find the line again."""
     print(direction)
     motors.bot.turn(direction)
-    time.sleep(2.0)
+    time.sleep(1.5)
     motors.bot.stop()
 
     line_sensor_readings = read_line_sensors()
@@ -162,7 +162,7 @@ def perform_task_move(direction, task_type, active_route):
     print(task_type)
 
     motors.bot.turn(direction)
-    time.sleep(1.5)
+    time.sleep(1.4)
 
     line_sensor_readings = read_line_sensors()
     inner_sensors = [line_sensor_readings[1], line_sensor_readings[2]]
@@ -171,7 +171,7 @@ def perform_task_move(direction, task_type, active_route):
         line_sensor_readings = read_line_sensors()
         inner_sensors = [line_sensor_readings[1], line_sensor_readings[2]]
     motors.bot.turn(direction)
-    time.sleep(0.1)
+    time.sleep(0.2)
 
     while line_sensor_readings != target_sensor_state:
         inner_sensors = [line_sensor_readings[1], line_sensor_readings[2]]
@@ -185,17 +185,23 @@ def perform_task_move(direction, task_type, active_route):
     motors.bot.stop()
     if task_type == "pickup":
         claw.lower()
-        time.sleep(0.2)
-        claw.open_claw()
-        time.sleep(0.1)
+        time.sleep(0.7)
+        claw.close_claw()
+        time.sleep(1)
         claw.lift()
+        time.sleep(1)
 
         active_route.delivery_pathfinding()
-        active_route.return_pathfinding()
         
     else:
-        claw.lower()
-        claw.close_claw_small()
+        claw.lower_small()
+        claw.open_claw_small()
+        led.red.value(Off)
+        led.yellow.value(Off)
+        led.green.value(Off)
+
+        active_route.return_pathfinding()
+        active_route.target_rack.slot_is_full(active_route.target_slot)
 
     line_sensor_readings = read_line_sensors()
     task_zone_cleared = False
@@ -227,7 +233,7 @@ def perform_task_move(direction, task_type, active_route):
     clear_sensor_samples = CLEAR_SAMPLES_REQUIRED
     if task_type == "delivery":
         claw.lift()
-        claw.close_claw()
+        claw.open_claw()
 
 
 def start_alignment(direction):
@@ -250,9 +256,9 @@ def start_alignment(direction):
 time.sleep(2)
 if config.button.value() == 1:
 
-    start_alignment("right")
+    start_alignment("left")
     claw.lift()
-    claw.close_claw()
+    claw.open_claw()
 
     while True:
         led.flash()

@@ -9,9 +9,9 @@ right_motor_dir = 4
 right_motor_pwm = 5
 
 # Status LED output pins.
-red_pin = 22
+red_pin = 20
 yellow_pin = 21
-green_pin = 20
+green_pin = 22
 
 # Servo control pins.
 servo_1 = 15

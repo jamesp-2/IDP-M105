@@ -1,11 +1,12 @@
 """Distance-sensor integration placeholder."""
 
 from machine import Pin, ADC, SoftI2C
-from config import track_1, track_2, track_3, track_4, hall_pin, sda_pin, scl_pin
+from config import track_1, track_2, track_3, track_4, hall_pin, sda_pin, scl_pin, ir_pin
 import time
 import sys
 from VL53L0X import VL53L0X
 from utime import sleep
+import claw
 
 
 
@@ -56,8 +57,7 @@ def get_distance():
     
 
 hall_adc = ADC(Pin(hall_pin, Pin.IN, Pin.PULL_DOWN))
-zero_reading= 40000
-threshold = 9000
+ir_adc = ADC(Pin(ir_pin, Pin.IN))
 
 def get_magnetic_reading():
     total = 0
@@ -68,13 +68,36 @@ def get_magnetic_reading():
 
     print(val)
 
-    #if val > 50000:
-        #print("North")
-        #return "N"
+    if val > 41000:
+        print("North")
+        return "N"
 
-    #elif val < 30000:
-        #print("South")
-        #return"S"
-    return "N"
+    elif val < 38000:
+        print("South")
+        return"S"
+    return "S"
+
+def ir_sensor():
+    print(ir_adc.read_u16())
+    time.sleep_ms(5)
+    
+#while True:
+    #ir_sensor()
+
+#claw.open_claw()
+#time.sleep(1)
+#claw.lower()
+#time.sleep(1.5)
+#claw.close_claw()
+#time.sleep(1)
+#claw.lift()
+#time.sleep(2)
+
+#while True:
+#    get_magnetic_reading()
+#    time.sleep_ms(100)
+    
+
+    
 
 

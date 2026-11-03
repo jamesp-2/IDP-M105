@@ -1,16 +1,23 @@
-"""Storage-rack occupancy and junction classification."""
+"""Storage-rack occupancy and junctiOn classificatiOn."""
+import sys
+
+if "IDP-files" not in sys.path:
+    sys.path.append("IDP-files")
+
 from motors import *
 import time
 import sensors
+import leds
+led = leds.LED()
+led.start()
 
-
-# Compass directions
+# Compass directiOns
 N = 0
 E = 1
 S = 2
 W = 3
 
-# Common route templates
+# CommOn route templates
 paths = {
     "right pickup 1": ["straight", "left", "left into pickup"],
     "right pickup 2": ["straight", "left", "straight", "left into pickup"],
@@ -22,13 +29,13 @@ paths = {
     "top left return": ["straight", "left"]
 }
 
-task_list = ["right pickup 1",
-            "left pickup 1",
-            "right pickup 2",
-            "left pickup 2"]
+task_list = ["left pickup 1",
+            "right pickup 1",
+            "left pickup 2",
+            "right pickup 2"]
 
 class route:
-    """Store and extend one pickup, delivery, and return route."""
+    """Store and extend pickup, delivery, and return route."""
 
     def __init__(self, pickup_path):
         self.pickup_path = pickup_path
@@ -45,20 +52,28 @@ class route:
         return self.sel_route
 
     def delivery_pathfinding(self):
-        """Add delivery steps based on the pickup path and magnetic reading."""
+        """Add delivery steps based On the pickup path and magnetic reading."""
         # Route outbound to the target rack
         if self.pickup_path == paths.get("right pickup 1"):
             if sensors.get_magnetic_reading() == "N":
+                led.red.value(leds.On)
+                led.yellow.value(leds.Off)
+                led.green.value(leds.Off)
                 self.floor = 1
                 self.sel_route.extend(["left", "right", "straight", "right", "straight"])
                 self.target_rack = top_right_rack
-                for _ in range(top_right_rack.first_available_slot()):
+                self.target_slot = self.target_rack.first_available_slot()
+                for _ in range(self.target_rack.first_available_slot()):
                     self.sel_route.append("straight")
                 self.sel_route.append("right into delivery")
             elif sensors.get_magnetic_reading() == "S":
+                led.red.value(leds.Off)
+                led.yellow.value(leds.Off)
+                led.green.value(leds.On)
                 self.sel_route.extend(["right", "straight"])
                 self.target_rack = bottom_right_rack
-                for _ in range(bottom_right_rack.first_available_slot()):
+                self.target_slot = self.target_rack.first_available_slot()
+                for _ in range(self.target_rack.first_available_slot()):
                     self.sel_route.append("straight")
                 self.sel_route.append("left into delivery")
             else:
@@ -66,16 +81,24 @@ class route:
 
         elif self.pickup_path == paths.get("right pickup 2"):
             if sensors.get_magnetic_reading() == "N":
+                led.red.value(leds.On)
+                led.yellow.value(leds.Off)
+                led.green.value(leds.Off)
                 self.floor = 1
                 self.sel_route.extend(["left", "straight", "right", "straight", "right", "straight"])
                 self.target_rack = top_right_rack
-                for _ in range(top_right_rack.first_available_slot()):
+                self.target_slot = self.target_rack.first_available_slot()
+                for _ in range(self.target_rack.first_available_slot()):
                     self.sel_route.append("straight")
                 self.sel_route.append("right into delivery")
             elif sensors.get_magnetic_reading() == "S":
+                led.red.value(leds.Off)
+                led.yellow.value(leds.Off)
+                led.green.value(leds.On)
                 self.target_rack = bottom_right_rack
+                self.target_slot = self.target_rack.first_available_slot()
                 self.sel_route.append("right")
-                for _ in range(bottom_right_rack.first_available_slot()):
+                for _ in range(self.target_rack.first_available_slot()):
                     self.sel_route.append("straight")
                 self.sel_route.append("left into delivery")
             else:
@@ -83,16 +106,24 @@ class route:
 
         elif self.pickup_path == paths.get("left pickup 1"):
             if sensors.get_magnetic_reading() == "N":
+                led.red.value(leds.On)
+                led.yellow.value(leds.Off)
+                led.green.value(leds.Off)
                 self.floor = 1
                 self.sel_route.extend(["right", "left", "straight", "left", "straight"])
                 self.target_rack = top_left_rack
-                for _ in range(top_left_rack.first_available_slot()):
+                self.target_slot = self.target_rack.first_available_slot()
+                for _ in range(self.target_rack.first_available_slot()):
                     self.sel_route.append("straight")
                 self.sel_route.append("left into delivery")
             elif sensors.get_magnetic_reading() == "S":
+                led.red.value(leds.Off)
+                led.yellow.value(leds.Off)
+                led.green.value(leds.On)
                 self.sel_route.extend(["left", "straight"])
                 self.target_rack = bottom_left_rack
-                for _ in range(bottom_right_rack.first_available_slot()):
+                self.target_slot = self.target_rack.first_available_slot()
+                for _ in range(self.target_rack.first_available_slot()):
                     self.sel_route.append("straight")
                 self.sel_route.append("right into delivery")
             else:
@@ -100,43 +131,51 @@ class route:
 
         elif self.pickup_path == paths.get("left pickup 2"):
             if sensors.get_magnetic_reading() == "N":
+                led.red.value(leds.On)
+                led.yellow.value(leds.Off)
+                led.green.value(leds.Off)
                 self.floor = 1
                 self.sel_route.extend(["right", "straight", "left", "straight", "left", "straight"])
                 self.target_rack = top_left_rack
-                for _ in range(top_left_rack.first_available_slot()):
+                self.target_slot = self.target_rack.first_available_slot()
+                for _ in range(self.target_rack.first_available_slot()):
                     self.sel_route.append("straight")
                 self.sel_route.append("left into delivery")
             elif sensors.get_magnetic_reading() == "S":
+                led.red.value(leds.Off)
+                led.yellow.value(leds.Off)
+                led.green.value(leds.On)
                 self.sel_route.extend(["left", "straight"])
                 self.target_rack = bottom_left_rack
-                for _ in range(bottom_right_rack.first_available_slot()):
+                self.target_slot = self.target_rack.first_available_slot()
+                for _ in range(self.target_rack.first_available_slot()):
                     self.sel_route.append("straight")
                 self.sel_route.append("right into delivery")
             else:
                 self.sel_route.extend(["right", "left", "straight"])
 
     def return_pathfinding(self):
-        """Append the return path based on the delivery floor and direction."""
+        """Append the return path based On the delivery floor and direction."""
         if self.floor == 1:
             if self.sel_route[-1] == "right into delivery":
                 self.sel_route.append("right")
-                for _ in range(top_right_rack.first_available_slot() - 1):
+                for _ in range(self.target_rack.first_available_slot() - 1):
                     self.sel_route.append("straight")
                 self.sel_route.extend(paths["top right return"])
             elif self.sel_route[-1] == "left into delivery":
                 self.sel_route.append("left")
-                for _ in range(top_left_rack.first_available_slot() - 1):
+                for _ in range(self.target_rack.first_available_slot() - 1):
                     self.sel_route.append("straight")
                 self.sel_route.extend(paths["top left return"])
         else:
             if self.sel_route[-1] == "right into delivery":
                 self.sel_route.append("right")
-                for _ in range(bottom_left_rack.first_available_slot() - 1):
+                for _ in range(self.target_rack.first_available_slot() - 1):
                     self.sel_route.append("straight")
                 self.sel_route.extend(paths["bottom left return"])
             elif self.sel_route[-1] == "left into delivery":
                 self.sel_route.append("left")
-                for _ in range(bottom_right_rack.first_available_slot() - 1):
+                for _ in range(self.target_rack.first_available_slot() - 1):
                     self.sel_route.append("straight")
                 self.sel_route.extend(paths["bottom right return"])
 
@@ -146,7 +185,7 @@ class route:
         import main
 
         # Mark the slot as filled if the object is detected
-        x = 10
+        x = 150
         dist = sensors.get_distance()
 
         if dist is not None and dist < x:
@@ -157,12 +196,13 @@ class route:
                 self.sel_route = self.sel_route[: main.route_counter]
                 self.sel_route.extend(["straight", delivery_turn])
                 self.return_pathfinding()
+                print(self.target_rack.first_available_slot())
             return 1
         return 0
 
 
 class rack():
-    """Track the free and occupied slots for one rack location."""
+    """Track the free and occupied slots for One rack locatiOn."""
 
     def __init__(self, side, floor, slt_list):
         self.side = side
@@ -196,17 +236,17 @@ class rack():
 
 
 class node():
-    """Classify a junction from the initial and follow-up sensor samples."""
+    """Classify a junctiOn from the initial and follow-up sensor samples."""
 
     def __init__(self, line_sensor_list):
         self.line_sensor_list = line_sensor_list
 
     def __repr__(self):
-        """Return a readable node description."""
+        """Return a readable node descriptiOn."""
         return f"Node(line_sensor_list={self.line_sensor_list})"
 
     def decide_node_type(self, read_sensors):
-        """Advance to the junction and classify it from a fresh sensor sample."""
+        """Advance to the junctiOn and classify it from a fresh sensor sample."""
         first_reading = self.line_sensor_list
         outer_first_reading = [first_reading[0], first_reading[-1]]
 
@@ -222,19 +262,19 @@ class node():
 
         if outer_first_reading == [1, 1]:
             if inner_second_reading == [0, 0]:
-                return "T junction"
+                return "T junctiOn"
             elif inner_second_reading == [1, 1]:
-                return "Cross junction"
+                return "Cross junctiOn"
         elif outer_first_reading == [1, 0]:
             if inner_second_reading == [0, 0]:
                 return "Left turn"
             elif inner_second_reading == [1, 1]:
-                return "Left T junction"
+                return "Left T junctiOn"
         elif outer_first_reading == [0, 1]:
             if inner_second_reading == [0, 0]:
                 return "Right turn"
             elif inner_second_reading == [1, 1]:
-                return "Right T junction"
+                return "Right T junctiOn"
 
 
 # Rack occupancy state for each storage area
@@ -243,7 +283,7 @@ bottom_left_rack = rack("left", "bottom", [0, 0, 0, 0, 0, 0])
 top_right_rack = rack("right", "top", [0, 0, 0, 0, 0, 0])
 bottom_right_rack = rack("right", "bottom", [0, 0, 0, 0, 0, 0])
 
-# Direction map from the start position
+# DirectiOn map from the start positiOn
 path_from_start = {
     "P1": [E, E, N],
     "P2": [E, E, N, N],
@@ -254,5 +294,8 @@ path_from_start = {
     "BR1": [E, E, N, N],
 }
 
-pick_up_locations = ["P1", "P2", "P3", "P4"]
-current_selection = 0
+pick_up_locatiOns = ["P1", "P2", "P3", "P4"]
+current_selectiOn = 0
+
+
+
