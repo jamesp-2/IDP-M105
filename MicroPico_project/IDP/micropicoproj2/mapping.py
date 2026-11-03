@@ -1,4 +1,4 @@
-"""Storage-rack occupancy and junctiOn classificatiOn."""
+"""Storage-rack occupancy and junction classification."""
 import sys
 
 if "IDP-files" not in sys.path:
@@ -11,13 +11,7 @@ import leds
 led = leds.LED()
 led.start()
 
-# Compass directiOns
-N = 0
-E = 1
-S = 2
-W = 3
-
-# CommOn route templates
+# Common route templates
 paths = {
     "right pickup 1": ["straight", "left", "left into pickup"],
     "right pickup 2": ["straight", "left", "straight", "left into pickup"],
@@ -182,7 +176,7 @@ class route:
     def box_in_slot(self):
         """Check whether the target slot is full and reroute if needed."""
         import sensors
-        import main
+        import pathing
 
         # Mark the slot as filled if the object is detected
         x = 150
@@ -192,8 +186,8 @@ class route:
             if hasattr(self, "target_rack"):
                 current_slot = self.target_rack.first_available_slot()
                 self.target_rack.slot_is_full(current_slot)
-                delivery_turn = self.sel_route[main.route_counter - 1]
-                self.sel_route = self.sel_route[: main.route_counter]
+                delivery_turn = self.sel_route[pathing.route_counter - 1]
+                self.sel_route = self.sel_route[: pathing.route_counter]
                 self.sel_route.extend(["straight", delivery_turn])
                 self.return_pathfinding()
                 print(self.target_rack.first_available_slot())
@@ -235,67 +229,8 @@ class rack():
             return False
 
 
-class node():
-    """Classify a junctiOn from the initial and follow-up sensor samples."""
-
-    def __init__(self, line_sensor_list):
-        self.line_sensor_list = line_sensor_list
-
-    def __repr__(self):
-        """Return a readable node descriptiOn."""
-        return f"Node(line_sensor_list={self.line_sensor_list})"
-
-    def decide_node_type(self, read_sensors):
-        """Advance to the junctiOn and classify it from a fresh sensor sample."""
-        first_reading = self.line_sensor_list
-        outer_first_reading = [first_reading[0], first_reading[-1]]
-
-        if outer_first_reading not in ([1, 1], [1, 0], [0, 1]):
-            return None
-
-        bot.stop()
-        start = time.time()
-        while time.time() - start < 0.4:
-            bot.forward(30)
-        second_reading = read_sensors()
-        inner_second_reading = [second_reading[1], second_reading[2]]
-
-        if outer_first_reading == [1, 1]:
-            if inner_second_reading == [0, 0]:
-                return "T junctiOn"
-            elif inner_second_reading == [1, 1]:
-                return "Cross junctiOn"
-        elif outer_first_reading == [1, 0]:
-            if inner_second_reading == [0, 0]:
-                return "Left turn"
-            elif inner_second_reading == [1, 1]:
-                return "Left T junctiOn"
-        elif outer_first_reading == [0, 1]:
-            if inner_second_reading == [0, 0]:
-                return "Right turn"
-            elif inner_second_reading == [1, 1]:
-                return "Right T junctiOn"
-
-
 # Rack occupancy state for each storage area
 top_left_rack = rack("left", "top", [0, 0, 0, 0, 0, 0])
 bottom_left_rack = rack("left", "bottom", [0, 0, 0, 0, 0, 0])
 top_right_rack = rack("right", "top", [0, 0, 0, 0, 0, 0])
 bottom_right_rack = rack("right", "bottom", [0, 0, 0, 0, 0, 0])
-
-# DirectiOn map from the start positiOn
-path_from_start = {
-    "P1": [E, E, N],
-    "P2": [E, E, N, N],
-    "P3": [W, W, N],
-    "P4": [W, W, N, N],
-    "BL1": [E, E, N, N],
-    "TR": [N, N],
-    "BR1": [E, E, N, N],
-}
-
-pick_up_locatiOns = ["P1", "P2", "P3", "P4"]
-current_selectiOn = 0
-
-
-

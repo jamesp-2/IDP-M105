@@ -68,9 +68,5 @@ def lower_small():
     servo_lift.set_angle(200)
     return
 
-#open_claw()
-#time.sleep(1)
-#close_claw()
-
 
 

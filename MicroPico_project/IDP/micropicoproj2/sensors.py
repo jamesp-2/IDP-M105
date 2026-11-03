@@ -97,7 +97,9 @@ def ir_sensor():
 #    get_magnetic_reading()
 #    time.sleep_ms(100)
     
-
+#while True:
+#    get_distance()
+#    time.sleep_ms(25)
     
 
 
