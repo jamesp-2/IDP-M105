@@ -4,11 +4,12 @@ import sys
 if "IDP-files" not in sys.path:
     sys.path.append("IDP-files")
 
-from motors import *
+import old_main
+from old_motors import *
 import time
-import sensors
-import leds
-led = leds.LED()
+import old_sensors
+import old_leds
+led = old_leds.LED()
 led.start()
 
 # Compass directiOns
@@ -55,10 +56,10 @@ class route:
         """Add delivery steps based On the pickup path and magnetic reading."""
         # Route outbound to the target rack
         if self.pickup_path == paths.get("right pickup 1"):
-            if sensors.get_magnetic_reading() == "N":
-                led.red.value(leds.On)
-                led.yellow.value(leds.Off)
-                led.green.value(leds.Off)
+            if old_sensors.get_magnetic_reading() == "N":
+                led.red.value(old_leds.On)
+                led.yellow.value(old_leds.Off)
+                led.green.value(old_leds.Off)
                 self.floor = 1
                 self.sel_route.extend(["left", "right", "straight", "right", "straight"])
                 self.target_rack = top_right_rack
@@ -66,10 +67,10 @@ class route:
                 for _ in range(self.target_rack.first_available_slot()):
                     self.sel_route.append("straight")
                 self.sel_route.append("right into delivery")
-            elif sensors.get_magnetic_reading() == "S":
-                led.red.value(leds.Off)
-                led.yellow.value(leds.Off)
-                led.green.value(leds.On)
+            elif old_sensors.get_magnetic_reading() == "S":
+                led.red.value(old_leds.Off)
+                led.yellow.value(old_leds.Off)
+                led.green.value(old_leds.On)
                 self.sel_route.extend(["right", "straight"])
                 self.target_rack = bottom_right_rack
                 self.target_slot = self.target_rack.first_available_slot()
@@ -80,10 +81,10 @@ class route:
                 self.sel_route.extend(["left", "right", "straight"])
 
         elif self.pickup_path == paths.get("right pickup 2"):
-            if sensors.get_magnetic_reading() == "N":
-                led.red.value(leds.On)
-                led.yellow.value(leds.Off)
-                led.green.value(leds.Off)
+            if old_sensors.get_magnetic_reading() == "N":
+                led.red.value(old_leds.On)
+                led.yellow.value(old_leds.Off)
+                led.green.value(old_leds.Off)
                 self.floor = 1
                 self.sel_route.extend(["left", "straight", "right", "straight", "right", "straight"])
                 self.target_rack = top_right_rack
@@ -91,10 +92,10 @@ class route:
                 for _ in range(self.target_rack.first_available_slot()):
                     self.sel_route.append("straight")
                 self.sel_route.append("right into delivery")
-            elif sensors.get_magnetic_reading() == "S":
-                led.red.value(leds.Off)
-                led.yellow.value(leds.Off)
-                led.green.value(leds.On)
+            elif old_sensors.get_magnetic_reading() == "S":
+                led.red.value(old_leds.Off)
+                led.yellow.value(old_leds.Off)
+                led.green.value(old_leds.On)
                 self.target_rack = bottom_right_rack
                 self.target_slot = self.target_rack.first_available_slot()
                 self.sel_route.append("right")
@@ -105,10 +106,10 @@ class route:
                 self.sel_route.extend(["left", "straight", "right", "straight"])
 
         elif self.pickup_path == paths.get("left pickup 1"):
-            if sensors.get_magnetic_reading() == "N":
-                led.red.value(leds.On)
-                led.yellow.value(leds.Off)
-                led.green.value(leds.Off)
+            if old_sensors.get_magnetic_reading() == "N":
+                led.red.value(old_leds.On)
+                led.yellow.value(old_leds.Off)
+                led.green.value(old_leds.Off)
                 self.floor = 1
                 self.sel_route.extend(["right", "left", "straight", "left", "straight"])
                 self.target_rack = top_left_rack
@@ -116,10 +117,10 @@ class route:
                 for _ in range(self.target_rack.first_available_slot()):
                     self.sel_route.append("straight")
                 self.sel_route.append("left into delivery")
-            elif sensors.get_magnetic_reading() == "S":
-                led.red.value(leds.Off)
-                led.yellow.value(leds.Off)
-                led.green.value(leds.On)
+            elif old_sensors.get_magnetic_reading() == "S":
+                led.red.value(old_leds.Off)
+                led.yellow.value(old_leds.Off)
+                led.green.value(old_leds.On)
                 self.sel_route.extend(["left", "straight"])
                 self.target_rack = bottom_left_rack
                 self.target_slot = self.target_rack.first_available_slot()
@@ -130,10 +131,10 @@ class route:
                 self.sel_route.extend(["right", "left", "straight"])
 
         elif self.pickup_path == paths.get("left pickup 2"):
-            if sensors.get_magnetic_reading() == "N":
-                led.red.value(leds.On)
-                led.yellow.value(leds.Off)
-                led.green.value(leds.Off)
+            if old_sensors.get_magnetic_reading() == "N":
+                led.red.value(old_leds.On)
+                led.yellow.value(old_leds.Off)
+                led.green.value(old_leds.Off)
                 self.floor = 1
                 self.sel_route.extend(["right", "straight", "left", "straight", "left", "straight"])
                 self.target_rack = top_left_rack
@@ -141,10 +142,10 @@ class route:
                 for _ in range(self.target_rack.first_available_slot()):
                     self.sel_route.append("straight")
                 self.sel_route.append("left into delivery")
-            elif sensors.get_magnetic_reading() == "S":
-                led.red.value(leds.Off)
-                led.yellow.value(leds.Off)
-                led.green.value(leds.On)
+            elif old_sensors.get_magnetic_reading() == "S":
+                led.red.value(old_leds.Off)
+                led.yellow.value(old_leds.Off)
+                led.green.value(old_leds.On)
                 self.sel_route.extend(["left", "straight"])
                 self.target_rack = bottom_left_rack
                 self.target_slot = self.target_rack.first_available_slot()
@@ -181,19 +182,17 @@ class route:
 
     def box_in_slot(self):
         """Check whether the target slot is full and reroute if needed."""
-        import sensors
-        import main
 
         # Mark the slot as filled if the object is detected
         x = 150
-        dist = sensors.get_distance()
+        dist = old_sensors.get_distance()
 
         if dist is not None and dist < x:
             if hasattr(self, "target_rack"):
                 current_slot = self.target_rack.first_available_slot()
                 self.target_rack.slot_is_full(current_slot)
-                delivery_turn = self.sel_route[main.route_counter - 1]
-                self.sel_route = self.sel_route[: main.route_counter]
+                delivery_turn = self.sel_route[old_main.route_counter - 1]
+                self.sel_route = self.sel_route[: old_main.route_counter]
                 self.sel_route.extend(["straight", delivery_turn])
                 self.return_pathfinding()
                 print(self.target_rack.first_available_slot())

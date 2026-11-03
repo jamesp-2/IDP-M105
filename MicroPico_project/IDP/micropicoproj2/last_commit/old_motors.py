@@ -6,7 +6,7 @@ if "IDP-files" not in sys.path:
     sys.path.append("IDP-files")
 
 from machine import Pin, PWM # type: ignore
-from config import left_motor_dir, left_motor_pwm, right_motor_dir, right_motor_pwm
+from old_config import left_motor_dir, left_motor_pwm, right_motor_dir, right_motor_pwm
 import time
 
 

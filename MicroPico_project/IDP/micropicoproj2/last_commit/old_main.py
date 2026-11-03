@@ -3,14 +3,14 @@ import sys
 if "IDP-files" not in sys.path:
     sys.path.append("IDP-files")
 
-import motors
+import old_motors
 import time
-import mapping
-import path
-import sensors
-import claw
-import config
-from leds import *
+import old_mapping
+import old_path as old_path
+import old_sensors
+import old_claw
+import old_config
+from old_leds import *
 
 route_counter = 0
 active_route = None
@@ -24,12 +24,12 @@ led.start()
 
 def read_line_sensors():
     """Return the current line sensor values from left to right."""
-    return [sensor.value() for sensor in sensors.track_sensors]
+    return [sensor.value() for sensor in old_sensors.track_sensors]
 
 
 def build_route(pickup_path):
     """Build the route plan for the selected pickup path."""
-    route_plan = mapping.route(pickup_path)
+    route_plan = old_mapping.route(pickup_path)
     route_plan.start_route()
     return route_plan
 
@@ -46,7 +46,7 @@ def pathing(line_sensor_readings, pickup_route):
     route = active_route.sel_route
 
     if route_counter >= len(route):
-        motors.bot.stop()
+        old_motors.bot.stop()
         return
 
     route_following(outer_sensors, inner_sensors, route, line_sensor_readings)
@@ -71,7 +71,7 @@ def route_following(outer_sensors, inner_sensors, route_plan, line_sensor_readin
     elif inner_sensors == [1, 1]:
         motors.bot.forward()
     else:
-        path.line_correction(line_sensor_readings)
+        old_path.line_correction(line_sensor_readings)
 
 
 def handle_junction(route_plan, line_sensor_readings):
@@ -82,8 +82,8 @@ def handle_junction(route_plan, line_sensor_readings):
     clear_sensor_samples = 0
     print("junction")
 
-    motors.bot.stop()
-    motors.bot.forward()
+    old_motors.bot.stop()
+    old_motors.bot.forward()
     time.sleep(0.43)
 
     action = route_plan[route_counter]
@@ -121,31 +121,31 @@ def handle_junction(route_plan, line_sensor_readings):
 def perform_straight_move():
     """Keep moving straight through a junction."""
     print("straight")
-    motors.bot.forward()
+    old_motors.bot.forward()
 
 
 def perform_turn(direction):
     """Turn until the centre sensors find the line again."""
     print(direction)
-    motors.bot.turn(direction)
+    old_motors.bot.turn(direction)
     time.sleep(1.5)
-    motors.bot.stop()
+    old_motors.bot.stop()
 
     line_sensor_readings = read_line_sensors()
     inner_sensors = [line_sensor_readings[1], line_sensor_readings[2]]
     while inner_sensors != [1, 1]:
-        motors.bot.turn(direction)
+        old_motors.bot.turn(direction)
         line_sensor_readings = read_line_sensors()
         inner_sensors = [line_sensor_readings[1], line_sensor_readings[2]]
 
-    path.line_correction(line_sensor_readings)
+    old_path.line_correction(line_sensor_readings)
 
 
 def perform_reverse_move(line_sensor_readings):
     """Reverse and pull the robot back onto the line."""
     print("reverse")
-    path.line_correction(line_sensor_readings, "R")
-    motors.bot.reverse()
+    old_path.line_correction(line_sensor_readings, "R")
+    old_motors.bot.reverse()
 
 
 def perform_task_move(direction, task_type, active_route):
@@ -161,41 +161,41 @@ def perform_task_move(direction, task_type, active_route):
         target_sensor_state = [0, 0, 0, 0]
     print(task_type)
 
-    motors.bot.turn(direction)
+    old_motors.bot.turn(direction)
     time.sleep(1.4)
 
     line_sensor_readings = read_line_sensors()
     inner_sensors = [line_sensor_readings[1], line_sensor_readings[2]]
     while inner_sensors != [1, 1]:
-        motors.bot.turn(direction)
+        old_motors.bot.turn(direction)
         line_sensor_readings = read_line_sensors()
         inner_sensors = [line_sensor_readings[1], line_sensor_readings[2]]
-    motors.bot.turn(direction)
+    old_motors.bot.turn(direction)
     time.sleep(0.2)
 
     while line_sensor_readings != target_sensor_state:
         inner_sensors = [line_sensor_readings[1], line_sensor_readings[2]]
         if inner_sensors == [1, 1]:
-            motors.bot.forward()
+            old_motors.bot.forward()
         else:
-            path.line_correction(line_sensor_readings)
+            old_path.line_correction(line_sensor_readings)
         time.sleep_ms(25)
         line_sensor_readings = read_line_sensors()
 
-    motors.bot.stop()
+    old_motors.bot.stop()
     if task_type == "pickup":
-        claw.lower()
+        old_claw.lower()
         time.sleep(0.7)
-        claw.close_claw()
+        old_claw.close_claw()
         time.sleep(1)
-        claw.lift()
+        old_claw.lift()
         time.sleep(1)
 
         active_route.delivery_pathfinding()
         
     else:
-        claw.lower_small()
-        claw.open_claw_small()
+        old_claw.lower_small()
+        old_claw.open_claw_small()
         led.red.value(Off)
         led.yellow.value(Off)
         led.green.value(Off)
@@ -214,14 +214,14 @@ def perform_task_move(direction, task_type, active_route):
 
         inner_sensors = [line_sensor_readings[1], line_sensor_readings[2]]
         if inner_sensors == [1, 1] or inner_sensors == [0, 0]:
-            motors.bot.reverse()
+            old_motors.bot.reverse()
         else:
-            path.line_correction(line_sensor_readings, "R")
+            old_path.line_correction(line_sensor_readings, "R")
 
         time.sleep_ms(25)
         line_sensor_readings = read_line_sensors()
 
-    motors.bot.stop()
+    old_motors.bot.stop()
 
     #if slot_state == 1:
         #if direction == "left":
@@ -232,45 +232,45 @@ def perform_task_move(direction, task_type, active_route):
     junction_handled = False
     clear_sensor_samples = CLEAR_SAMPLES_REQUIRED
     if task_type == "delivery":
-        claw.lift()
-        claw.open_claw()
+        old_claw.lift()
+        old_claw.open_claw()
 
 
 def start_alignment(direction):
     """Rotate until the centre sensors find the line and stop."""
-    motors.bot.turn(direction)
+    old_motors.bot.turn(direction)
     time.sleep(0.5)
 
     line_sensor_readings = read_line_sensors()
     inner_sensors = [line_sensor_readings[1], line_sensor_readings[2]]
     while inner_sensors != [1, 1]:
         print([line_sensor_readings[0], line_sensor_readings[1], line_sensor_readings[2], line_sensor_readings[3]])
-        motors.bot.turn(direction)
+        old_motors.bot.turn(direction)
         line_sensor_readings = read_line_sensors()
         inner_sensors = [line_sensor_readings[1], line_sensor_readings[2]]
 
-    motors.bot.turn(direction)
+    old_motors.bot.turn(direction)
     time.sleep(0.2)
-    motors.bot.stop()
+    old_motors.bot.stop()
 
 time.sleep(2)
-if config.button.value() == 1:
+if old_config.button.value() == 1:
 
     start_alignment("left")
-    claw.lift()
-    claw.open_claw()
+    old_claw.lift()
+    old_claw.open_claw()
 
     while True:
         led.flash()
-        if current_pickup_index >= len(mapping.task_list):
-            motors.bot.stop()
+        if current_pickup_index >= len(old_mapping.task_list):
+            old_motors.bot.stop()
             break
 
         readings = read_line_sensors()
         print(readings)
 
-        current_task_name = mapping.task_list[current_pickup_index]
-        current_pickup_path = mapping.paths.get(current_task_name)
+        current_task_name = old_mapping.task_list[current_pickup_index]
+        current_pickup_path = old_mapping.paths.get(current_task_name)
         print(current_pickup_path)
         pathing(readings, current_pickup_path)
         time.sleep_ms(25)

@@ -3,7 +3,6 @@ from machine import ADC
 from machine import I2C
 from utime import sleep
 from VL53L0X import VL53L0X
-from utime import sleep
 
 
 print("Tracker sensor testing...")

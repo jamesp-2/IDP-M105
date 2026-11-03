@@ -7,8 +7,8 @@ if "IDP-files" not in sys.path:
 
 from machine import Pin #type: ignore
 import time
-from config import red_pin, yellow_pin, green_pin
-from sensors import get_magnetic_reading
+from old_config import red_pin, yellow_pin, green_pin
+from old_sensors import get_magnetic_reading
 
 # Digital output levels used for turning an LED on or off.
 On = 1

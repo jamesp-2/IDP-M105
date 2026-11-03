@@ -5,7 +5,7 @@ import sys
 if "IDP-files" not in sys.path:
     sys.path.append("IDP-files")
 
-from config import servo_1, servo_2
+from old_config import servo_1, servo_2
 from machine import Pin, PWM #type: ignore
 import time
 

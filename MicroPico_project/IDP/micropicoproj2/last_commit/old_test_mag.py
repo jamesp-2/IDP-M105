@@ -1,10 +1,10 @@
 from machine import Pin, ADC
-import config
+import old_config
 import time
 import sys
 
 
-hall_adc = ADC(Pin(config.hall_pin, Pin.IN))
+hall_adc = ADC(Pin(old_config.hall_pin, Pin.IN))
 zero_reading= 400
 threshold = 9000
 

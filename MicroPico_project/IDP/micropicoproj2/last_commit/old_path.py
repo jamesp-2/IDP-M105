@@ -5,10 +5,10 @@ import sys
 if "IDP-files" not in sys.path:
     sys.path.append("IDP-files")
 
-from mapping import *
+from old_mapping import *
 import time
-from motors import *
-from sensors import *
+from old_motors import *
+from old_sensors import *
 
 
 def line_correction(line_sensor_readings, direction = "F"):

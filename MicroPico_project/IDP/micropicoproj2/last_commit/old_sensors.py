@@ -1,12 +1,11 @@
 """Distance-sensor integration placeholder."""
 
 from machine import Pin, ADC, SoftI2C
-from config import track_1, track_2, track_3, track_4, hall_pin, sda_pin, scl_pin, ir_pin
+from old_config import track_1, track_2, track_3, track_4, hall_pin, sda_pin, scl_pin, ir_pin
 import time
 import sys
 from VL53L0X import VL53L0X
 from utime import sleep
-import claw
 
 
 
