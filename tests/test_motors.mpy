@@ -1,8 +1,0 @@
-from gpiozero import Motor
-
-left_motor = Motor(0,0)
-right_motor= Motor(0,0)
-
-while True:
-    left_motor.forward()
-    right_motor.backward()
