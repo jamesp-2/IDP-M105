@@ -57,7 +57,10 @@ Miscellaneous files containing tests for different sensors during development
 
 ## Algorithm Structure
 
-<img width="530" height="1152" alt="image(1)" src="https://github.com/user-attachments/assets/956b1ab5-bcf6-44e7-af62-c2183ffaa8a9" />
+<img width="530" height="1052" alt="image(1)" src="https://github.com/user-attachments/assets/14b85557-1aed-44c0-9c36-065d2edaa214" />
+
+
+
 
 
 
