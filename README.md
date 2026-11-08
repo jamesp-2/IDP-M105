@@ -1,4 +1,4 @@
-<img width="653" height="451" alt="Screenshot 2026-11-08 at 17 30 08" src="https://github.com/user-attachments/assets/ebb5ee45-8274-4e98-8616-3bc9578eb88f" /># Integrated Design Project M105
+# Integrated Design Project M105
 
 ## Project Overview
 
